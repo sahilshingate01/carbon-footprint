@@ -1,0 +1,203 @@
+@import "tailwindcss";
+
+/* ─── Design tokens (Vercel-inspired dark theme) ─── */
+@theme inline {
+  --color-background: #0a0a0a;
+  --color-foreground: #ededed;
+
+  /* Surface system */
+  --color-surface-0: #000000;
+  --color-surface-1: #0a0a0a;
+  --color-surface-2: #111111;
+  --color-surface-3: #171717;
+  --color-surface-4: #1a1a1a;
+
+  /* Text */
+  --color-ink: #ededed;
+  --color-body: #a1a1a1;
+  --color-mute: #666666;
+
+  /* Borders */
+  --color-hairline: #222222;
+  --color-hairline-strong: #333333;
+
+  /* Brand gradients */
+  --color-brand-blue: #007cf0;
+  --color-brand-cyan: #00dfd8;
+  --color-brand-violet: #7928ca;
+  --color-brand-pink: #ff0080;
+  --color-brand-red: #ff4d4d;
+  --color-brand-amber: #f9cb28;
+
+  /* Semantic */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  /* Category colors */
+  --color-cat-transport: #007cf0;
+  --color-cat-energy: #f9cb28;
+  --color-cat-diet: #ff0080;
+
+  /* Eco score */
+  --color-eco-a: #22c55e;
+  --color-eco-b: #84cc16;
+  --color-eco-c: #f59e0b;
+  --color-eco-d: #f97316;
+  --color-eco-f: #ef4444;
+
+  /* Fonts */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Spacing */
+  --spacing-section: 12rem;
+
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 100px;
+
+  /* Breakpoints */
+  --breakpoint-xs: 480px;
+
+  /* Animations */
+  --animate-fade-in: fade-in 0.5s ease-out both;
+  --animate-slide-up: slide-up 0.5s ease-out both;
+  --animate-scale-in: scale-in 0.3s ease-out both;
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ─── Base ─── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-surface-1);
+  color: var(--color-ink);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--color-brand-blue);
+  color: #fff;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-hairline-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-mute);
+}
+
+/* ─── Gradient mesh backdrop ─── */
+@layer components {
+  .gradient-mesh {
+    background: radial-gradient(ellipse at 20% 50%, rgba(0, 124, 240, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(121, 40, 202, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 80%, rgba(255, 0, 128, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 30%, rgba(0, 223, 216, 0.08) 0%, transparent 50%);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--color-brand-blue) 0%, var(--color-brand-cyan) 50%, var(--color-brand-pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-warm {
+    background: linear-gradient(135deg, var(--color-brand-red) 0%, var(--color-brand-amber) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .card-elevated {
+    background: var(--color-surface-3);
+    border: 1px solid var(--color-hairline);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.03) inset,
+                0 1px 1px rgba(0,0,0,0.1),
+                0 2px 4px rgba(0,0,0,0.1),
+                0 4px 8px rgba(0,0,0,0.08);
+  }
+
+  .card-soft {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-hairline);
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 20px rgba(0, 124, 240, 0.15),
+                0 0 40px rgba(0, 124, 240, 0.08);
+  }
+
+  .glow-green {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.15),
+                0 0 40px rgba(34, 197, 94, 0.08);
+  }
+}
+
+/* ─── Recharts dark theme overrides ─── */
+.recharts-default-tooltip {
+  background: var(--color-surface-3) !important;
+  border: 1px solid var(--color-hairline) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important;
+}
+
+.recharts-tooltip-label {
+  color: var(--color-ink) !important;
+  font-weight: 500 !important;
+}
+
+.recharts-tooltip-item {
+  color: var(--color-body) !important;
+}
+
+.recharts-cartesian-grid line {
+  stroke: var(--color-hairline) !important;
+}
+
+.recharts-text {
+  fill: var(--color-mute) !important;
+  font-size: 12px !important;
+}
