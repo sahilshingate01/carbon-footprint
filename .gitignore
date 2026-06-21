@@ -40,3 +40,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# developer artifacts
+CLAUDE.md
+DESIGN.md
+.agents/
+AGENTS.md
+skills-lock.json
+task.md

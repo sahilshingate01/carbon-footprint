@@ -4,9 +4,9 @@ import {
   calculateEcoScore,
   annualizeEmissions,
   getPercentageBreakdown
-} from '../calculations';
-import { EMISSION_FACTORS } from '../constants';
-import { validateCalculatorInputs, sanitizeCalculatorInputs } from '../validation';
+} from '@/lib/calculations';
+import { EMISSION_FACTORS } from '@/lib/constants';
+import { validateCalculatorInputs, sanitizeCalculatorInputs } from '@/lib/validation';
 import type { CalculatorInputs, EmissionBreakdown } from '@/types';
 
 describe('calculations.ts unit tests', () => {

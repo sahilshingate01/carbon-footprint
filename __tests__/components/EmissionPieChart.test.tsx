@@ -1,7 +1,7 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import EmissionPieChart from '../EmissionPieChart';
+import EmissionPieChart from '@/components/EmissionPieChart';
 
 vi.mock('recharts', async () => {
   const original = await vi.importActual('recharts') as Record<string, unknown>;

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { generateSuggestions, generateReductionPlan } from '../suggestions';
+import { generateSuggestions, generateReductionPlan } from '@/lib/suggestions';
 import type { CalculatorInputs, EmissionBreakdown } from '@/types';
 
 describe('suggestions.ts unit tests', () => {

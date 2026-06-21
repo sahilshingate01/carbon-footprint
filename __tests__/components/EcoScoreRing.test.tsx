@@ -1,6 +1,6 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
-import EcoScoreRing from '../EcoScoreRing';
+import EcoScoreRing from '@/components/EcoScoreRing';
 import type { EcoScore } from '@/types';
 
 describe('EcoScoreRing component', () => {

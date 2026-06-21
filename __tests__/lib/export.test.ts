@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from 'vitest';
-import { exportToPDF } from '../export';
+import { exportToPDF } from '@/lib/export';
 
 describe('export.ts unit tests', () => {
   test('calls window.print when in a browser environment', () => {

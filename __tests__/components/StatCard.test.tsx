@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import StatCard from '../StatCard';
+import StatCard from '@/components/StatCard';
 
 describe('StatCard component', () => {
   test('renders label, value, and unit correctly', () => {

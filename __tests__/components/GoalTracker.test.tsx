@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import GoalTracker from '../GoalTracker';
+import GoalTracker from '@/components/GoalTracker';
 
 describe('GoalTracker component', () => {
   test('renders prompt to set goal when no goal is present', () => {

@@ -82,6 +82,9 @@ It uses a warm, nature-inspired light design system with a clean, grid-based aes
 
 ```text
 carbon-footprint/
+├── __tests__/            # Unit & component test suite
+│   ├── components/       # Test files for React components
+│   └── lib/              # Test files for business logic helpers
 ├── app/                  # Next.js Pages and App Router setup
 │   ├── calculator/       # Carbon Footprint Calculator Page
 │   ├── dashboard/        # Interactive Dashboard Page
@@ -92,16 +95,23 @@ carbon-footprint/
 │   ├── not-found.tsx     # Custom 404 Page
 │   └── page.tsx          # Homepage
 ├── components/           # Reusable UI & Chart Components
+│   ├── CalculatorResults.tsx # Calculation results display
+│   ├── DashboardStats.tsx # Dashboard stats card row
 │   ├── EcoScoreRing.tsx  # Circular score indicator
-│   ├── EmissionPieChart.tsx
-│   ├── EmissionTrendChart.tsx
-│   ├── EmptyState.tsx
-│   ├── Footer.tsx
-│   ├── LoadingState.tsx
-│   ├── MonthlyBarChart.tsx
-│   ├── Navbar.tsx
-│   ├── ReductionPlan.tsx
-│   └── StatCard.tsx
+│   ├── EmissionPieChart.tsx # Emissions category pie chart
+│   ├── EmissionTrendChart.tsx # Weekly trend area chart
+│   ├── EmptyState.tsx    # Empty dashboard view
+│   ├── Footer.tsx        # Shared page footer
+│   ├── GoalTracker.tsx   # Carbon budget goal tracker
+│   ├── LoadingState.tsx  # Dashboard loading skeleton
+│   ├── MonthlyBarChart.tsx # Monthly comparison bar chart
+│   ├── Navbar.tsx        # Responsive navigation header
+│   ├── RecentEntriesTable.tsx # Recent entries table
+│   ├── ReductionPlan.tsx # 30-day reduction action plan
+│   ├── RegionalComparison.tsx # Comparative emission bar chart
+│   ├── StatCard.tsx      # Reusable dashboard stats card
+│   ├── StorageWarning.tsx # Browser localStorage quota warning
+│   └── SuggestionCard.tsx # AI reduction recommendation card
 ├── hooks/                # Custom React Hooks
 │   └── useUserData.ts    # Stateful localStorage wrapper
 ├── lib/                  # Helper modules and constants

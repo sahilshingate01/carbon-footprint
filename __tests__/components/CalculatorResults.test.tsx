@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import CalculatorResults from '../CalculatorResults';
+import CalculatorResults from '@/components/CalculatorResults';
 import type { CalculatorInputs, EmissionBreakdown, EcoScore } from '@/types';
 
 // Mock next/navigation

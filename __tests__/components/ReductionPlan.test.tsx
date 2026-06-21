@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import ReductionPlan from '../ReductionPlan';
+import ReductionPlan from '@/components/ReductionPlan';
 import type { ReductionPlanDay } from '@/types';
 
 const mockPlan: ReductionPlanDay[] = [

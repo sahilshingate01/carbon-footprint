@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import SuggestionCard, { AIInsightsBanner } from '../SuggestionCard';
+import SuggestionCard, { AIInsightsBanner } from '@/components/SuggestionCard';
 import type { AISuggestion } from '@/types';
 
 const mockSuggestion: AISuggestion = {

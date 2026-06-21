@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import RegionalComparison from '../RegionalComparison';
+import RegionalComparison from '@/components/RegionalComparison';
 
 describe('RegionalComparison component', () => {
   test('renders user annualized footprint details and country selector', () => {

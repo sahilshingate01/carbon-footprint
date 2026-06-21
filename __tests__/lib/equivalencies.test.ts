@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { getCarbonEquivalents } from '../equivalencies';
+import { getCarbonEquivalents } from '@/lib/equivalencies';
 
 describe('equivalencies.ts unit tests', () => {
   test('calculates correct equivalents for typical emission values', () => {

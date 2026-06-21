@@ -9,8 +9,8 @@ import {
   getLocalStorageUsage,
   importUserData,
   exportUserData
-} from '../storage';
-import { STORAGE_KEY } from '../constants';
+} from '@/lib/storage';
+import { STORAGE_KEY } from '@/lib/constants';
 import type { UserData, CalculatorInputs, EmissionBreakdown, EcoScore, WeeklyEntry } from '@/types';
 
 // In-memory mock for localStorage

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { SHARED_TOOLTIP_STYLE, formatEmissions, formatPieEmissions } from '../chartConfig';
+import { SHARED_TOOLTIP_STYLE, formatEmissions, formatPieEmissions } from '@/lib/chartConfig';
 
 describe('chartConfig.ts unit tests', () => {
   test('defines SHARED_TOOLTIP_STYLE correctly', () => {

@@ -1,7 +1,7 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import EmissionTrendChart from '../EmissionTrendChart';
+import EmissionTrendChart from '@/components/EmissionTrendChart';
 import type { WeeklyEntry } from '@/types';
 
 vi.mock('recharts', async () => {

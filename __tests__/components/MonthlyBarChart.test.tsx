@@ -1,7 +1,7 @@
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import MonthlyBarChart from '../MonthlyBarChart';
+import MonthlyBarChart from '@/components/MonthlyBarChart';
 import type { MonthlyAggregate } from '@/types';
 
 vi.mock('recharts', async () => {

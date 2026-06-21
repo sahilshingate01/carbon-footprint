@@ -10,7 +10,7 @@ import {
   sanitizeTransportMode,
   sanitizeDietType,
   sanitizeCalculatorInputs
-} from '../validation';
+} from '@/lib/validation';
 
 describe('validation.ts unit tests', () => {
   describe('validateDistance', () => {
