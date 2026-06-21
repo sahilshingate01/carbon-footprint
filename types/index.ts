@@ -1,7 +1,9 @@
 // Carbon Footprint Types
 
+export type TransportMode = 'car' | 'bike' | 'public';
+
 export interface TransportData {
-  mode: 'car' | 'bike' | 'public';
+  mode: TransportMode;
   distancePerWeek: number; // km
 }
 

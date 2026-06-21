@@ -1,5 +1,10 @@
-import type { CalculatorInputs, DietType } from '@/types';
-import { VALID_TRANSPORT_MODES, VALID_DIET_TYPES } from './constants';
+import type { CalculatorInputs, DietType, TransportMode } from '@/types';
+import {
+  VALID_TRANSPORT_MODES,
+  VALID_DIET_TYPES,
+  isValidDietType,
+  isValidTransportMode,
+} from './constants';
 
 export interface ValidationError {
   field: string;
@@ -41,8 +46,7 @@ export function validateElectricity(electricity: number): string | null {
  * Validates diet type option.
  */
 export function validateDietType(dietType: string): string | null {
-  const validTypes = VALID_DIET_TYPES as unknown as string[];
-  if (!dietType || !validTypes.includes(dietType)) {
+  if (!dietType || !isValidDietType(dietType)) {
     return `Diet type must be one of: ${VALID_DIET_TYPES.join(', ')}`;
   }
   return null;
@@ -52,8 +56,7 @@ export function validateDietType(dietType: string): string | null {
  * Validates transport mode option.
  */
 export function validateTransportMode(mode: string): string | null {
-  const validModes = VALID_TRANSPORT_MODES as unknown as string[];
-  if (!mode || !validModes.includes(mode)) {
+  if (!mode || !isValidTransportMode(mode)) {
     return `Transport mode must be one of: ${VALID_TRANSPORT_MODES.join(', ')}`;
   }
   return null;
@@ -97,18 +100,17 @@ export function validateCalculatorInputs(
 }
 
 /**
- * Sanitizes travel distance per week. Clamps value between 0 and 2000 km,
- * and ensures it is a valid finite number.
+ * Generic helper to parse, sanitize, and clamp a numeric input value.
  */
-export function sanitizeDistance(distance: unknown): number {
-  if (distance === undefined || distance === null) {
+export function sanitizeNumericInput(value: unknown, min: number, max: number): number {
+  if (value === undefined || value === null) {
     return 0;
   }
   let numVal = 0;
-  if (typeof distance === 'number') {
-    numVal = distance;
-  } else if (typeof distance === 'string') {
-    numVal = parseFloat(distance);
+  if (typeof value === 'number') {
+    numVal = value;
+  } else if (typeof value === 'string') {
+    numVal = parseFloat(value);
   } else {
     return 0;
   }
@@ -116,7 +118,15 @@ export function sanitizeDistance(distance: unknown): number {
   if (isNaN(numVal) || !isFinite(numVal)) {
     return 0;
   }
-  return Math.max(0, Math.min(2000, numVal));
+  return Math.max(min, Math.min(max, numVal));
+}
+
+/**
+ * Sanitizes travel distance per week. Clamps value between 0 and 2000 km,
+ * and ensures it is a valid finite number.
+ */
+export function sanitizeDistance(distance: unknown): number {
+  return sanitizeNumericInput(distance, 0, 2000);
 }
 
 /**
@@ -124,31 +134,15 @@ export function sanitizeDistance(distance: unknown): number {
  * and ensures it is a valid finite number.
  */
 export function sanitizeElectricity(electricity: unknown): number {
-  if (electricity === undefined || electricity === null) {
-    return 0;
-  }
-  let numVal = 0;
-  if (typeof electricity === 'number') {
-    numVal = electricity;
-  } else if (typeof electricity === 'string') {
-    numVal = parseFloat(electricity);
-  } else {
-    return 0;
-  }
-
-  if (isNaN(numVal) || !isFinite(numVal)) {
-    return 0;
-  }
-  return Math.max(0, Math.min(5000, numVal));
+  return sanitizeNumericInput(electricity, 0, 5000);
 }
 
 /**
  * Whitelists the transport mode to valid modes: 'car', 'bike', or 'public'.
  */
-export function sanitizeTransportMode(mode: unknown): 'car' | 'bike' | 'public' {
-  const validModes = VALID_TRANSPORT_MODES as unknown as string[];
-  if (typeof mode === 'string' && validModes.includes(mode)) {
-    return mode as 'car' | 'bike' | 'public';
+export function sanitizeTransportMode(mode: unknown): TransportMode {
+  if (typeof mode === 'string' && isValidTransportMode(mode)) {
+    return mode;
   }
   return 'car';
 }
@@ -157,9 +151,8 @@ export function sanitizeTransportMode(mode: unknown): 'car' | 'bike' | 'public' 
  * Whitelists the diet type to valid types: 'vegetarian', 'mixed', or 'non-vegetarian'.
  */
 export function sanitizeDietType(dietType: unknown): DietType {
-  const validTypes = VALID_DIET_TYPES as unknown as string[];
-  if (typeof dietType === 'string' && validTypes.includes(dietType)) {
-    return dietType as DietType;
+  if (typeof dietType === 'string' && isValidDietType(dietType)) {
+    return dietType;
   }
   return 'mixed';
 }
@@ -194,5 +187,3 @@ export function sanitizeCalculatorInputs(inputs: unknown): CalculatorInputs {
     },
   };
 }
-
-
