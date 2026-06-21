@@ -58,7 +58,14 @@ export default function RegionalComparison({ annual }: RegionalComparisonProps) 
             <span>Your Footprint (Annualized)</span>
             <span>{(annual / 1000).toFixed(1)} tonnes CO₂/yr</span>
           </div>
-          <div className="h-4 w-full rounded bg-hairline overflow-hidden">
+          <div 
+            className="h-4 w-full rounded bg-hairline overflow-hidden"
+            role="meter"
+            aria-valuenow={annual / 1000}
+            aria-valuemin={0}
+            aria-valuemax={maxVal / 1000}
+            aria-label="Your annualized carbon footprint"
+          >
             <div
               className="h-full bg-brand-blue rounded"
               style={{ width: `${Math.max(5, Math.min(100, userBarWidth))}%` }}
@@ -71,7 +78,14 @@ export default function RegionalComparison({ annual }: RegionalComparisonProps) 
             <span>{selectedCountry.name} Average per capita</span>
             <span>{(selectedCountry.annualPerCapita / 1000).toFixed(1)} tonnes CO₂/yr</span>
           </div>
-          <div className="h-4 w-full rounded bg-hairline overflow-hidden">
+          <div 
+            className="h-4 w-full rounded bg-hairline overflow-hidden"
+            role="meter"
+            aria-valuenow={selectedCountry.annualPerCapita / 1000}
+            aria-valuemin={0}
+            aria-valuemax={maxVal / 1000}
+            aria-label={`${selectedCountry.name} average per capita carbon footprint`}
+          >
             <div
               className="h-full bg-mute rounded"
               style={{ width: `${Math.max(5, Math.min(100, countryBarWidth))}%` }}

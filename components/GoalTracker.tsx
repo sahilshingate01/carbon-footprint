@@ -106,7 +106,14 @@ export default function GoalTracker({ weeklyGoal, latestEmissions, onUpdateGoal 
           </div>
 
           {/* Progress bar */}
-          <div className="h-2 w-full rounded-full bg-hairline overflow-hidden">
+          <div 
+            className="h-2 w-full rounded-full bg-hairline overflow-hidden"
+            role="progressbar"
+            aria-valuenow={percentage}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Weekly carbon goal progress"
+          >
             <div
               className={`h-full transition-all duration-500 rounded-full ${
                 isOverGoal ? 'bg-error' : 'bg-success'

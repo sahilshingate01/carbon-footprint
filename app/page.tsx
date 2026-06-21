@@ -52,7 +52,7 @@ export default function Home() {
       {/* Stats band */}
       <section id="stats-band" className="border-y border-hairline bg-surface-0">
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+          <dl className="grid grid-cols-2 gap-6 sm:grid-cols-4">
             {[
               { value: '4.7t', label: 'Global Avg CO₂/Year', icon: '🌍' },
               { value: '26%', label: 'From Transport', icon: '🚗' },
@@ -60,12 +60,13 @@ export default function Home() {
               { value: '18%', label: 'From Food', icon: '🥗' },
             ].map((stat) => (
               <div key={stat.label} className="flex flex-col items-center text-center">
-                <span className="text-2xl mb-2">{stat.icon}</span>
-                <span className="text-2xl font-semibold text-ink tracking-tight">{stat.value}</span>
-                <span className="mt-1 text-xs text-mute">{stat.label}</span>
+                <dt className="sr-only">{stat.label}</dt>
+                <span className="text-2xl mb-2" aria-hidden="true">{stat.icon}</span>
+                <dd className="text-2xl font-semibold text-ink tracking-tight">{stat.value}</dd>
+                <dt className="mt-1 text-xs text-mute" aria-hidden="true">{stat.label}</dt>
               </div>
             ))}
-          </div>
+          </dl>
         </div>
       </section>
 

@@ -51,7 +51,14 @@ export default memo(function ReductionPlan({ plan, completedDays = [], onToggleD
             <span className="text-xs text-mute font-medium whitespace-nowrap">
               {completedCount}/{totalCount} days ({percentComplete}%)
             </span>
-            <div className="h-1.5 flex-1 rounded-full bg-hairline overflow-hidden min-w-[80px]">
+            <div 
+              className="h-1.5 flex-1 rounded-full bg-hairline overflow-hidden min-w-[80px]"
+              role="progressbar"
+              aria-valuenow={percentComplete}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label="30-day reduction plan progress"
+            >
               <div
                 className="h-full bg-brand-blue transition-all duration-300 rounded-full"
                 style={{ width: `${percentComplete}%` }}
