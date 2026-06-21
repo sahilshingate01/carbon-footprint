@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, Suspense } from 'react';
+import { useMemo, useCallback, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
-import { RotateCcw, ArrowRight, Zap, AlertTriangle } from 'lucide-react';
+import { RotateCcw, ArrowRight, Zap } from 'lucide-react';
 import type { CalculatorInputs, EmissionBreakdown, EcoScore, UserData } from '@/types';
 import type { StorageUsage } from '@/lib/storage';
 import { annualizeEmissions, getPercentageBreakdown } from '@/lib/calculations';
@@ -13,6 +13,7 @@ import StatCard from '@/components/StatCard';
 import SuggestionCard, { AIInsightsBanner } from '@/components/SuggestionCard';
 import ReductionPlan from '@/components/ReductionPlan';
 import RegionalComparison from '@/components/RegionalComparison';
+import StorageWarning from '@/components/StorageWarning';
 import dynamic from 'next/dynamic';
 
 const EmissionPieChart = dynamic(() => import('@/components/EmissionPieChart'), { ssr: false });
@@ -89,17 +90,30 @@ export default function CalculatorResults({
     return getCarbonEquivalents(results.emissions.total);
   }, [results]);
 
+  const toggleSuggestion = useCallback((suggestionId: string) => {
+    updateData((prev) => {
+      const list = prev.completedSuggestions || [];
+      const nextList = list.includes(suggestionId)
+        ? list.filter((id) => id !== suggestionId)
+        : [...list, suggestionId];
+      return { ...prev, completedSuggestions: nextList };
+    });
+  }, [updateData]);
+
+  const togglePlanDay = useCallback((day: number) => {
+    updateData((prev) => {
+      const list = prev.completedPlanDays || [];
+      const nextList = list.includes(day)
+        ? list.filter((d) => d !== day)
+        : [...list, day];
+      return { ...prev, completedPlanDays: nextList };
+    });
+  }, [updateData]);
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16" id="calculator-results">
       {/* Storage Limit Warning */}
-      {quota?.isApproachingLimit && (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-error/20 bg-error/5 p-4 text-sm text-error animate-fade-in">
-          <AlertTriangle className="h-5 w-5 shrink-0 text-error" />
-          <div>
-            <span className="font-semibold text-ink">Storage Warning:</span> You are approaching your browser&apos;s storage limit ({quota.percentage}% used). Please consider exporting your data and clearing some entries to avoid data loss.
-          </div>
-        </div>
-      )}
+      <StorageWarning quota={quota} />
 
       {/* Header */}
       <div className="flex items-center justify-between mb-8 animate-fade-in">
@@ -147,22 +161,22 @@ export default function CalculatorResults({
         <div className="grid gap-4 grid-cols-2 sm:grid-cols-4">
           <div className="card-soft rounded-lg p-4 text-center">
             <div className="text-2xl mb-1">🌳</div>
-            <div className="text-lg font-semibold text-ink">{equivalents ? equivalents.treesYear.toFixed(1) : '0.0'}</div>
+            <div className="text-lg font-semibold text-ink">{equivalents.treesYear.toFixed(1)}</div>
             <div className="text-xs text-mute">Mature tree-years to offset</div>
           </div>
           <div className="card-soft rounded-lg p-4 text-center">
             <div className="text-2xl mb-1">🚗</div>
-            <div className="text-lg font-semibold text-ink">{equivalents ? Math.round(equivalents.drivingKm) : 0} km</div>
+            <div className="text-lg font-semibold text-ink">{Math.round(equivalents.drivingKm)} km</div>
             <div className="text-xs text-mute">Driving a gasoline car</div>
           </div>
           <div className="card-soft rounded-lg p-4 text-center">
             <div className="text-2xl mb-1">✈️</div>
-            <div className="text-lg font-semibold text-ink">{equivalents ? Math.round(equivalents.flightKm) : 0} km</div>
+            <div className="text-lg font-semibold text-ink">{Math.round(equivalents.flightKm)} km</div>
             <div className="text-xs text-mute">Commercial flight distance</div>
           </div>
           <div className="card-soft rounded-lg p-4 text-center">
             <div className="text-2xl mb-1">💡</div>
-            <div className="text-lg font-semibold text-ink">{equivalents ? Math.round(equivalents.lightbulbHours).toLocaleString() : 0} hrs</div>
+            <div className="text-lg font-semibold text-ink">{Math.round(equivalents.lightbulbHours).toLocaleString()} hrs</div>
             <div className="text-xs text-mute">60W lightbulb run time</div>
           </div>
         </div>
@@ -190,13 +204,7 @@ export default function CalculatorResults({
               suggestion={s}
               index={i}
               isCompleted={completedSuggestions.includes(s.id)}
-              onToggleComplete={() => {
-                updateData((prev) => {
-                  const list = prev.completedSuggestions || [];
-                  const nextList = list.includes(s.id) ? list.filter((id) => id !== s.id) : [...list, s.id];
-                  return { ...prev, completedSuggestions: nextList };
-                });
-              }}
+              onToggleComplete={() => toggleSuggestion(s.id)}
             />
           ))}
         </div>
@@ -213,13 +221,7 @@ export default function CalculatorResults({
                 suggestion={s}
                 index={i}
                 isCompleted={completedSuggestions.includes(s.id)}
-                onToggleComplete={() => {
-                  updateData((prev) => {
-                    const list = prev.completedSuggestions || [];
-                    const nextList = list.includes(s.id) ? list.filter((id) => id !== s.id) : [...list, s.id];
-                    return { ...prev, completedSuggestions: nextList };
-                  });
-                }}
+                onToggleComplete={() => toggleSuggestion(s.id)}
               />
             ))}
           </div>
@@ -231,13 +233,7 @@ export default function CalculatorResults({
         <ReductionPlan
           plan={plan}
           completedDays={completedPlanDays}
-          onToggleDay={(day) => {
-            updateData((prev) => {
-              const list = prev.completedPlanDays || [];
-              const nextList = list.includes(day) ? list.filter((d) => d !== day) : [...list, day];
-              return { ...prev, completedPlanDays: nextList };
-            });
-          }}
+          onToggleDay={togglePlanDay}
         />
       </div>
     </div>

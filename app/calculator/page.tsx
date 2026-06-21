@@ -8,6 +8,7 @@ import { calculateEmissions, calculateEcoScore } from '@/lib/calculations';
 import { useUserData } from '@/hooks/useUserData';
 import { validateCalculatorInputs, sanitizeCalculatorInputs } from '@/lib/validation';
 import CalculatorResults from '@/components/CalculatorResults';
+import StorageWarning from '@/components/StorageWarning';
 
 const transportIcons: Record<string, React.ReactNode> = {
   car: <Car className="h-5 w-5" />,
@@ -59,7 +60,7 @@ export default function CalculatorPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [inputs, addEntry]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setStep('input');
     setResults(null);
     setValidationErrors({});
@@ -68,7 +69,7 @@ export default function CalculatorPage() {
       energy: { monthlyElectricity: 250 },
       diet: { type: 'mixed' },
     });
-  };
+  }, []);
 
   if (step === 'results' && results) {
     return (
@@ -88,14 +89,7 @@ export default function CalculatorPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-16">
       {/* Storage Limit Warning */}
-      {quota?.isApproachingLimit && (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-error/20 bg-error/5 p-4 text-sm text-error animate-fade-in">
-          <span className="shrink-0 text-error">⚠️</span>
-          <div>
-            <span className="font-semibold text-ink">Storage Warning:</span> You are approaching your browser&apos;s storage limit ({quota.percentage}% used). Please consider exporting your data and clearing some entries to avoid data loss.
-          </div>
-        </div>
-      )}
+      <StorageWarning quota={quota} />
       <div className="text-center mb-10 animate-fade-in">
         <span className="font-mono text-xs uppercase tracking-wider text-brand-blue">Calculator</span>
         <h1 className="mt-2 text-3xl font-semibold tracking-[-1.28px] text-ink sm:text-4xl">
