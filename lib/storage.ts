@@ -1,6 +1,12 @@
 import { z } from 'zod';
-import type { UserData, WeeklyEntry, CalculatorInputs, EmissionBreakdown, EcoScore } from '@/types';
-import { STORAGE_KEY } from './constants';
+import type { UserData, WeeklyEntry, CalculatorInputs, EmissionBreakdown, EcoScore, MonthlyAggregate } from '@/types';
+import {
+  STORAGE_KEY,
+  MAX_STORED_ENTRIES,
+  LOCAL_STORAGE_MAX_BYTES,
+  STORAGE_WARNING_THRESHOLD,
+} from './constants';
+import { roundTo2 } from './calculations';
 
 // Zod schemas for validating data integrity
 export const TransportDataSchema = z.object({
@@ -53,6 +59,10 @@ export const UserDataSchema = z.object({
   completedPlanDays: z.array(z.number()).optional().default([]),
 });
 
+/**
+ * Helper function to generate default state structure for UserData.
+ * @returns An empty default UserData object.
+ */
 function getDefaultData(): UserData {
   return {
     entries: [],
@@ -64,6 +74,10 @@ function getDefaultData(): UserData {
   };
 }
 
+/**
+ * Load user data from localStorage and validate against schema.
+ * @returns The validated UserData object or default empty state.
+ */
 export function loadUserData(): UserData {
   if (typeof window === 'undefined') return getDefaultData();
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -90,6 +104,10 @@ export function loadUserData(): UserData {
   }
 }
 
+/**
+ * Save user data to localStorage after validating against schema.
+ * @param data - The UserData object to persist.
+ */
 export function saveUserData(data: UserData): void {
   if (typeof window === 'undefined') return;
   try {
@@ -107,6 +125,13 @@ export function saveUserData(data: UserData): void {
   }
 }
 
+/**
+ * Add a new weekly calculation entry to user data history and cap the size.
+ * @param inputs - The inputs used for the calculation.
+ * @param emissions - The calculated emission breakdown.
+ * @param ecoScore - The calculated eco-score and grade.
+ * @returns The newly created WeeklyEntry object.
+ */
 export function addEntry(
   inputs: CalculatorInputs,
   emissions: EmissionBreakdown,
@@ -131,9 +156,9 @@ export function addEntry(
 
   data.entries.push(entry);
 
-  // Enforce FIFO limit cap of 520 entries (10 years of weekly data)
-  if (data.entries.length > 520) {
-    data.entries = data.entries.slice(-520);
+  // Enforce FIFO limit cap of MAX_STORED_ENTRIES
+  if (data.entries.length > MAX_STORED_ENTRIES) {
+    data.entries = data.entries.slice(-MAX_STORED_ENTRIES);
   }
 
   data.lastCalculation = inputs;
@@ -142,11 +167,22 @@ export function addEntry(
   return entry;
 }
 
+/**
+ * Get a sliced array of recent weekly entries.
+ * @param data - The UserData containing entries.
+ * @param count - The number of entries to retrieve (defaults to 10).
+ * @returns Array of recent WeeklyEntry objects.
+ */
 export function getRecentEntries(data: UserData, count = 10): WeeklyEntry[] {
   return data.entries.slice(-count);
 }
 
-export function getMonthlyAggregates(data: UserData) {
+/**
+ * Aggregates weekly data into monthly emissions and eco-score metrics.
+ * @param data - The UserData containing entries.
+ * @returns Array of MonthlyAggregate values.
+ */
+export function getMonthlyAggregates(data: UserData): MonthlyAggregate[] {
   const monthMap = new Map<string, {
     totalEmissions: number;
     totalScore: number;
@@ -174,21 +210,28 @@ export function getMonthlyAggregates(data: UserData) {
 
   return Array.from(monthMap.entries()).map(([month, agg]) => ({
     month,
-    totalEmissions: Math.round(agg.totalEmissions * 100) / 100,
+    totalEmissions: roundTo2(agg.totalEmissions),
     avgEcoScore: Math.round(agg.totalScore / agg.count),
     entries: agg.count,
     breakdown: {
-      transport: Math.round(agg.transport * 100) / 100,
-      energy: Math.round(agg.energy * 100) / 100,
-      diet: Math.round(agg.diet * 100) / 100,
-      total: Math.round(agg.totalEmissions * 100) / 100,
+      transport: roundTo2(agg.transport),
+      energy: roundTo2(agg.energy),
+      diet: roundTo2(agg.diet),
+      total: roundTo2(agg.totalEmissions),
     },
   }));
 }
 
+/**
+ * Deletes the user data stored under the main storage key in localStorage.
+ */
 export function clearAllData(): void {
   if (typeof window === 'undefined') return;
-  localStorage.removeItem(STORAGE_KEY);
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (error) {
+    console.error("Failed to clear data from localStorage:", error);
+  }
 }
 
 export interface StorageUsage {
@@ -198,10 +241,13 @@ export interface StorageUsage {
   isApproachingLimit: boolean;
 }
 
+/**
+ * Calculate the amount of bytes used in localStorage.
+ * @returns StorageUsage containing used bytes, limit, percentage, and warning flag.
+ */
 export function getLocalStorageUsage(): StorageUsage {
-  const maxBytes = 5 * 1024 * 1024; // 5MB limit
   if (typeof window === 'undefined') {
-    return { usedBytes: 0, maxBytes, percentage: 0, isApproachingLimit: false };
+    return { usedBytes: 0, maxBytes: LOCAL_STORAGE_MAX_BYTES, percentage: 0, isApproachingLimit: false };
   }
 
   try {
@@ -214,31 +260,41 @@ export function getLocalStorageUsage(): StorageUsage {
         total += (key.length + (val ? val.length : 0)) * 2;
       }
     }
-    const percentage = (total / maxBytes) * 100;
+    const percentage = (total / LOCAL_STORAGE_MAX_BYTES) * 100;
     return {
       usedBytes: total,
-      maxBytes,
-      percentage: Math.round(percentage * 100) / 100,
-      isApproachingLimit: percentage >= 80, // Warning threshold at 80% (4MB)
+      maxBytes: LOCAL_STORAGE_MAX_BYTES,
+      percentage: roundTo2(percentage),
+      isApproachingLimit: percentage >= STORAGE_WARNING_THRESHOLD, // Warning threshold at 80%
     };
   } catch (error) {
     console.error("Error calculating localStorage usage:", error);
-    return { usedBytes: 0, maxBytes, percentage: 0, isApproachingLimit: false };
+    return { usedBytes: 0, maxBytes: LOCAL_STORAGE_MAX_BYTES, percentage: 0, isApproachingLimit: false };
   }
 }
 
-export function exportUserData(): void {
-  if (typeof window === 'undefined') return;
-  const data = loadUserData();
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `carbontrack-export-${new Date().toISOString().split('T')[0]}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+/**
+ * Export user data by triggering a download of a JSON file.
+ * @returns Status of the export action.
+ */
+export function exportUserData(): { success: boolean; error?: string } {
+  if (typeof window === 'undefined') return { success: false, error: 'Not in browser' };
+  try {
+    const data = loadUserData();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `carbontrack-export-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to export user data:', error);
+    return { success: false, error: String(error) };
+  }
 }
 
 export interface ImportResult {
@@ -246,6 +302,11 @@ export interface ImportResult {
   error?: string;
 }
 
+/**
+ * Validate and import user data string in JSON format.
+ * @param jsonString - The JSON formatted string to import.
+ * @returns ImportResult indicating success or details of any failure.
+ */
 export function importUserData(jsonString: string): ImportResult {
   try {
     const parsed = JSON.parse(jsonString);
