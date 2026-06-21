@@ -1,14 +1,41 @@
+import { memo } from 'react';
+
 interface StatCardProps {
+  /**
+   * The short name or description of the statistic.
+   */
   label: string;
+  /**
+   * The primary metric value (rendered in large text).
+   */
   value: string;
+  /**
+   * The measurement unit (e.g. "kg CO₂").
+   */
   unit?: string;
+  /**
+   * Optional icon to render in the card's top right corner.
+   */
   icon?: React.ReactNode;
+  /**
+   * Optional trend direction relative to previous calculations.
+   */
   trend?: 'up' | 'down' | 'neutral';
+  /**
+   * Text context summarizing the trend difference.
+   */
   trendValue?: string;
+  /**
+   * Optional CSS overrides.
+   */
   className?: string;
 }
 
-export default function StatCard({ label, value, unit, icon, trend, trendValue, className = '' }: StatCardProps) {
+/**
+ * StatCard displays a single highlight statistic in an elevated container.
+ * Features optional semantic coloring based on trend direction.
+ */
+const StatCard = memo(function StatCard({ label, value, unit, icon, trend, trendValue, className = '' }: StatCardProps) {
   const trendColor = trend === 'down' ? 'text-eco-a' : trend === 'up' ? 'text-error' : 'text-mute';
 
   return (
@@ -28,4 +55,6 @@ export default function StatCard({ label, value, unit, icon, trend, trendValue, 
       )}
     </div>
   );
-}
+});
+
+export default StatCard;

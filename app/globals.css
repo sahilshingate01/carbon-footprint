@@ -1,50 +1,50 @@
 @import "tailwindcss";
 
-/* ─── Design tokens (Vercel-inspired dark theme) ─── */
+/* ─── Design tokens (Warm light theme — earthy green accent) ─── */
 @theme inline {
-  --color-background: #0a0a0a;
-  --color-foreground: #ededed;
+  --color-background: #f7f7f2;
+  --color-foreground: #1a1a1a;
 
-  /* Surface system */
-  --color-surface-0: #000000;
-  --color-surface-1: #0a0a0a;
-  --color-surface-2: #111111;
-  --color-surface-3: #171717;
-  --color-surface-4: #1a1a1a;
+  /* Surface system — warm off-whites */
+  --color-surface-0: #f7f7f2;
+  --color-surface-1: #f2f2ed;
+  --color-surface-2: #ffffff;
+  --color-surface-3: #ffffff;
+  --color-surface-4: #fafaf5;
 
   /* Text */
-  --color-ink: #ededed;
-  --color-body: #a1a1a1;
-  --color-mute: #666666;
+  --color-ink: #1a1a1a;
+  --color-body: #4a4a4a;
+  --color-mute: #656565;
 
   /* Borders */
-  --color-hairline: #222222;
-  --color-hairline-strong: #333333;
+  --color-hairline: #e5e5df;
+  --color-hairline-strong: #d0d0c8;
 
-  /* Brand gradients */
-  --color-brand-blue: #007cf0;
-  --color-brand-cyan: #00dfd8;
-  --color-brand-violet: #7928ca;
-  --color-brand-pink: #ff0080;
-  --color-brand-red: #ff4d4d;
-  --color-brand-amber: #f9cb28;
+  /* Brand — nature-inspired greens */
+  --color-brand-blue: #2d8a4e;
+  --color-brand-cyan: #3daa68;
+  --color-brand-violet: #5b7a3a;
+  --color-brand-pink: #c4653a;
+  --color-brand-red: #c4653a;
+  --color-brand-amber: #d4a84b;
 
   /* Semantic */
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
+  --color-success: #2d8a4e;
+  --color-warning: #d4a84b;
+  --color-error: #c4443a;
 
-  /* Category colors */
-  --color-cat-transport: #007cf0;
-  --color-cat-energy: #f9cb28;
-  --color-cat-diet: #ff0080;
+  /* Category colors — earthy tones */
+  --color-cat-transport: #4a90a8;
+  --color-cat-energy: #d4a84b;
+  --color-cat-diet: #c4653a;
 
   /* Eco score */
-  --color-eco-a: #22c55e;
-  --color-eco-b: #84cc16;
-  --color-eco-c: #f59e0b;
-  --color-eco-d: #f97316;
-  --color-eco-f: #ef4444;
+  --color-eco-a: #2d8a4e;
+  --color-eco-b: #5b9a3a;
+  --color-eco-c: #d4a84b;
+  --color-eco-d: #c4853a;
+  --color-eco-f: #c4443a;
 
   /* Fonts */
   --font-sans: var(--font-geist-sans);
@@ -97,7 +97,7 @@ html {
 }
 
 body {
-  background: var(--color-surface-1);
+  background: var(--color-surface-0);
   color: var(--color-ink);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -128,60 +128,59 @@ body {
   background: var(--color-mute);
 }
 
-/* ─── Gradient mesh backdrop ─── */
+/* ─── Gradient mesh backdrop — warm natural wash ─── */
 @layer components {
   .gradient-mesh {
-    background: radial-gradient(ellipse at 20% 50%, rgba(0, 124, 240, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 20%, rgba(121, 40, 202, 0.12) 0%, transparent 50%),
-                radial-gradient(ellipse at 60% 80%, rgba(255, 0, 128, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse at 40% 30%, rgba(0, 223, 216, 0.08) 0%, transparent 50%);
+    background: radial-gradient(ellipse at 20% 50%, rgba(45, 138, 78, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(212, 168, 75, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 80%, rgba(196, 101, 58, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 30%, rgba(61, 170, 104, 0.05) 0%, transparent 50%);
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, var(--color-brand-blue) 0%, var(--color-brand-cyan) 50%, var(--color-brand-pink) 100%);
+    background: linear-gradient(135deg, #2d8a4e 0%, #3daa68 50%, #5b9a3a 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .gradient-text-warm {
-    background: linear-gradient(135deg, var(--color-brand-red) 0%, var(--color-brand-amber) 100%);
+    background: linear-gradient(135deg, #c4653a 0%, #d4a84b 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .card-elevated {
-    background: var(--color-surface-3);
+    background: var(--color-surface-2);
     border: 1px solid var(--color-hairline);
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.03) inset,
-                0 1px 1px rgba(0,0,0,0.1),
-                0 2px 4px rgba(0,0,0,0.1),
-                0 4px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04),
+                0 2px 4px rgba(0,0,0,0.03),
+                0 4px 8px rgba(0,0,0,0.02);
   }
 
   .card-soft {
-    background: var(--color-surface-2);
+    background: var(--color-surface-4);
     border: 1px solid var(--color-hairline);
   }
 
   .glow-blue {
-    box-shadow: 0 0 20px rgba(0, 124, 240, 0.15),
-                0 0 40px rgba(0, 124, 240, 0.08);
+    box-shadow: 0 0 20px rgba(45, 138, 78, 0.08),
+                0 0 40px rgba(45, 138, 78, 0.04);
   }
 
   .glow-green {
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.15),
-                0 0 40px rgba(34, 197, 94, 0.08);
+    box-shadow: 0 0 20px rgba(45, 138, 78, 0.1),
+                0 0 40px rgba(45, 138, 78, 0.05);
   }
 }
 
-/* ─── Recharts dark theme overrides ─── */
+/* ─── Recharts light theme overrides ─── */
 .recharts-default-tooltip {
-  background: var(--color-surface-3) !important;
+  background: #ffffff !important;
   border: 1px solid var(--color-hairline) !important;
   border-radius: var(--radius-md) !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important;
 }
 
 .recharts-tooltip-label {
@@ -200,4 +199,29 @@ body {
 .recharts-text {
   fill: var(--color-mute) !important;
   font-size: 12px !important;
+}
+
+/* ─── Focus states ─── */
+*:focus-visible {
+  outline: 2px solid var(--color-brand-blue);
+  outline-offset: 2px;
+}
+
+/* ─── Print Styles ─── */
+@media print {
+  nav, footer, .no-print, button, select, input, .flex-wrap, a[href="/calculator"] {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  main {
+    padding-top: 0 !important;
+  }
+  .card-elevated {
+    box-shadow: none !important;
+    border: 1px solid var(--color-hairline) !important;
+    page-break-inside: avoid;
+  }
 }

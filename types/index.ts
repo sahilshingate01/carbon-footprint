@@ -71,4 +71,7 @@ export interface UserData {
   entries: WeeklyEntry[];
   lastCalculation: CalculatorInputs | null;
   createdAt: string;
+  weeklyGoal?: number | null; // weekly emissions target in kg CO2
+  completedSuggestions?: string[]; // IDs of completed suggestions
+  completedPlanDays?: number[]; // day numbers (1-30) of completed reduction plan tasks
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import {
   PieChart,
   Pie,
@@ -10,8 +11,12 @@ import {
 } from 'recharts';
 import type { EmissionBreakdown } from '@/types';
 import { CATEGORY_COLORS } from '@/lib/constants';
+import { SHARED_TOOLTIP_STYLE, formatPieEmissions } from '@/lib/chartConfig';
 
 interface EmissionPieChartProps {
+  /**
+   * The breakdown of emissions across categories (transport, energy, diet).
+   */
   emissions: EmissionBreakdown;
 }
 
@@ -21,7 +26,11 @@ const CHART_COLORS = [
   CATEGORY_COLORS.diet,
 ];
 
-export default function EmissionPieChart({ emissions }: EmissionPieChartProps) {
+/**
+ * EmissionPieChart renders a Recharts Pie chart displaying the breakdown
+ * of weekly carbon emissions by category (Transport, Energy, Diet).
+ */
+const EmissionPieChart = memo(function EmissionPieChart({ emissions }: EmissionPieChartProps) {
   const data = [
     { name: 'Transport', value: emissions.transport, color: CHART_COLORS[0] },
     { name: 'Energy', value: emissions.energy, color: CHART_COLORS[1] },
@@ -37,7 +46,26 @@ export default function EmissionPieChart({ emissions }: EmissionPieChartProps) {
   }
 
   return (
-    <div className="h-72 w-full" id="emission-pie-chart">
+    <div className="h-72 w-full" id="emission-pie-chart" role="img" aria-label="Pie chart showing emission breakdown by category">
+      <div className="sr-only">
+        <table>
+          <caption>Carbon emissions breakdown by category</caption>
+          <thead>
+            <tr>
+              <th scope="col">Category</th>
+              <th scope="col">Emissions (kg CO₂)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item) => (
+              <tr key={item.name}>
+                <td>{item.name}</td>
+                <td>{item.value.toFixed(1)} kg</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -57,17 +85,8 @@ export default function EmissionPieChart({ emissions }: EmissionPieChartProps) {
             ))}
           </Pie>
           <Tooltip
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            formatter={((value: any) => [`${Number(value).toFixed(2)} kg CO₂`, '']) as any}
-            contentStyle={{
-              background: '#171717',
-              border: '1px solid #222',
-              borderRadius: '8px',
-              fontSize: '13px',
-              color: '#ededed',
-            }}
-            itemStyle={{ color: '#a1a1a1' }}
-            labelStyle={{ color: '#ededed', fontWeight: 500 }}
+            {...SHARED_TOOLTIP_STYLE}
+            formatter={formatPieEmissions}
           />
           <Legend
             verticalAlign="bottom"
@@ -82,4 +101,6 @@ export default function EmissionPieChart({ emissions }: EmissionPieChartProps) {
       </ResponsiveContainer>
     </div>
   );
-}
+});
+
+export default EmissionPieChart;

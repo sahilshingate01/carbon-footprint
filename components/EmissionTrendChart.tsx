@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import {
   AreaChart,
   Area,
@@ -10,12 +11,20 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { WeeklyEntry } from '@/types';
+import { SHARED_TOOLTIP_STYLE, formatEmissions } from '@/lib/chartConfig';
 
 interface EmissionTrendChartProps {
+  /**
+   * List of historical weekly entries to plot the emission trends.
+   */
   entries: WeeklyEntry[];
 }
 
-export default function EmissionTrendChart({ entries }: EmissionTrendChartProps) {
+/**
+ * EmissionTrendChart renders a Recharts Area chart demonstrating the progression
+ * of total emissions and individual categories over the tracked weeks.
+ */
+const EmissionTrendChart = memo(function EmissionTrendChart({ entries }: EmissionTrendChartProps) {
   const data = entries.map((entry, index) => ({
     name: `W${entry.weekNumber}`,
     total: entry.emissions.total,
@@ -35,54 +44,66 @@ export default function EmissionTrendChart({ entries }: EmissionTrendChartProps)
   }
 
   return (
-    <div className="h-72 w-full" id="emission-trend-chart">
+    <div className="h-72 w-full" id="emission-trend-chart" role="img" aria-label="Line chart showing weekly emission trend over time">
+      <div className="sr-only">
+        <table>
+          <caption>Weekly emissions trend over time</caption>
+          <thead>
+            <tr>
+              <th scope="col">Week</th>
+              <th scope="col">Total Emissions (kg CO₂)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item) => (
+              <tr key={item.index}>
+                <td>{item.name}</td>
+                <td>{item.total.toFixed(1)} kg</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
           <defs>
             <linearGradient id="gradTotal" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#007cf0" stopOpacity={0.3} />
-              <stop offset="100%" stopColor="#007cf0" stopOpacity={0} />
+              <stop offset="0%" stopColor="#2d8a4e" stopOpacity={0.2} />
+              <stop offset="100%" stopColor="#2d8a4e" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#222" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e5df" />
           <XAxis
             dataKey="name"
-            stroke="#666"
+            stroke="#8a8a8a"
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
-            stroke="#666"
+            stroke="#8a8a8a"
             fontSize={12}
             tickLine={false}
             axisLine={false}
             tickFormatter={(v: number) => `${v}`}
           />
           <Tooltip
-            contentStyle={{
-              background: '#171717',
-              border: '1px solid #222',
-              borderRadius: '8px',
-              fontSize: '13px',
-              color: '#ededed',
-            }}
-            itemStyle={{ color: '#a1a1a1' }}
-            labelStyle={{ color: '#ededed', fontWeight: 500 }}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            formatter={((value: any) => [`${Number(value).toFixed(2)} kg CO₂`]) as any}
+            {...SHARED_TOOLTIP_STYLE}
+            formatter={formatEmissions}
           />
           <Area
             type="monotone"
             dataKey="total"
-            stroke="#007cf0"
+            stroke="#2d8a4e"
             strokeWidth={2}
             fill="url(#gradTotal)"
-            dot={{ fill: '#007cf0', strokeWidth: 0, r: 3 }}
+            dot={{ fill: '#2d8a4e', strokeWidth: 0, r: 3 }}
             activeDot={{ r: 5, strokeWidth: 0 }}
           />
         </AreaChart>
       </ResponsiveContainer>
     </div>
   );
-}
+});
+
+export default EmissionTrendChart;

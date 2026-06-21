@@ -3,11 +3,34 @@ import { CATEGORY_ICONS } from '@/lib/constants';
 import { ArrowDown, Sparkles } from 'lucide-react';
 
 interface SuggestionCardProps {
+  /**
+   * The personalized AI-generated emission reduction suggestion.
+   */
   suggestion: AISuggestion;
+  /**
+   * The index of the card in the list, used to offset animations.
+   */
   index: number;
+  /**
+   * Whether the suggestion has been marked completed by the user.
+   */
+  isCompleted?: boolean;
+  /**
+   * Callback function triggered when completion checkbox is toggled.
+   */
+  onToggleComplete?: () => void;
 }
 
-export default function SuggestionCard({ suggestion, index }: SuggestionCardProps) {
+/**
+ * SuggestionCard displays a single actionable recommendation to lower emissions.
+ * Highlights potential CO₂ savings per week and categorizes suggestion types.
+ */
+export default function SuggestionCard({
+  suggestion,
+  index,
+  isCompleted = false,
+  onToggleComplete,
+}: SuggestionCardProps) {
   const impactColors = {
     high: 'text-eco-a bg-eco-a/10 border-eco-a/20',
     medium: 'text-brand-amber bg-brand-amber/10 border-brand-amber/20',
@@ -16,12 +39,23 @@ export default function SuggestionCard({ suggestion, index }: SuggestionCardProp
 
   return (
     <div
-      className="card-elevated rounded-xl p-5 transition-all duration-300 hover:border-hairline-strong animate-slide-up group"
+      className={`card-elevated rounded-xl p-5 transition-all duration-300 hover:border-hairline-strong animate-slide-up group ${
+        isCompleted ? 'border-success/40 bg-success/5 opacity-80' : ''
+      }`}
       style={{ animationDelay: `${index * 80}ms` }}
       id={`suggestion-${suggestion.id}`}
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-2.5">
+          {onToggleComplete && (
+            <input
+              type="checkbox"
+              checked={isCompleted}
+              onChange={onToggleComplete}
+              className="h-4 w-4 rounded border-hairline text-brand-blue focus:ring-brand-blue cursor-pointer"
+              aria-label={`Mark "${suggestion.title}" as completed`}
+            />
+          )}
           <span className="text-lg">{CATEGORY_ICONS[suggestion.category]}</span>
           <h3 className="text-sm font-semibold text-ink tracking-tight">{suggestion.title}</h3>
         </div>
@@ -41,6 +75,10 @@ export default function SuggestionCard({ suggestion, index }: SuggestionCardProp
   );
 }
 
+/**
+ * AIInsightsBanner presents a promotional banner summarizing potential cumulative
+ * weekly CO₂ savings if all AI-suggested modifications are implemented.
+ */
 export function AIInsightsBanner({ totalSavings }: { totalSavings: number }) {
   return (
     <div className="card-elevated rounded-xl p-6 glow-blue" id="ai-insights-banner">

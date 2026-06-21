@@ -1,6 +1,11 @@
 import { Leaf, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
+/**
+ * Footer component rendered at the bottom of all pages.
+ * Displays brand logo, product navigation, links to resources and developer profiles,
+ * and standard licensing/academic notices.
+ */
 export default function Footer() {
   return (
     <footer

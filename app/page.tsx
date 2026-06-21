@@ -9,7 +9,7 @@ export default function Home() {
         <div className="gradient-mesh absolute inset-0 pointer-events-none" />
         <div className="relative mx-auto max-w-6xl px-4 pt-24 pb-20 sm:px-6 sm:pt-32 sm:pb-28 lg:pt-40 lg:pb-36">
           <div className="flex flex-col items-center text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-hairline bg-surface-2/80 px-3 py-1 backdrop-blur-sm animate-fade-in">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-blue/20 bg-brand-blue/5 px-3 py-1 animate-fade-in">
               <Leaf className="h-3.5 w-3.5 text-eco-a" />
               <span className="font-mono text-xs text-mute">
                 Carbon Footprint Awareness Platform
@@ -30,7 +30,7 @@ export default function Home() {
               <Link
                 href="/calculator"
                 id="hero-cta-primary"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-base font-medium text-surface-0 transition-all hover:bg-white hover:scale-[1.02] active:scale-[0.98]"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-base font-medium text-white transition-all hover:bg-ink/80 hover:scale-[1.02] active:scale-[0.98]"
               >
                 Calculate Now
                 <ArrowRight className="h-4 w-4" />
@@ -38,7 +38,7 @@ export default function Home() {
               <Link
                 href="/dashboard"
                 id="hero-cta-secondary"
-                className="inline-flex h-12 items-center justify-center rounded-full border border-hairline-strong bg-surface-2/50 px-6 text-base font-medium text-ink backdrop-blur-sm transition-all hover:bg-surface-3 hover:scale-[1.02] active:scale-[0.98]"
+                className="inline-flex h-12 items-center justify-center rounded-full border border-hairline-strong bg-white/60 px-6 text-base font-medium text-ink backdrop-blur-sm transition-all hover:bg-white hover:scale-[1.02] active:scale-[0.98]"
               >
                 View Dashboard
               </Link>
@@ -68,7 +68,7 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section id="features" className="bg-surface-1">
+      <section id="features" className="bg-surface-4">
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
           <div className="text-center mb-14">
             <span className="font-mono text-xs uppercase tracking-wider text-brand-blue">Features</span>
@@ -119,7 +119,7 @@ export default function Home() {
                 description: 'A customized daily action plan to systematically reduce your carbon footprint.',
                 color: 'text-brand-cyan bg-brand-cyan/10',
               },
-            ].map((feature, i) => (
+            ].map((feature) => (
               <div
                 key={feature.title}
                 className="card-elevated rounded-xl p-6 transition-all duration-300 hover:border-hairline-strong hover:translate-y-[-2px] group"
@@ -149,7 +149,7 @@ export default function Home() {
           <Link
             href="/calculator"
             id="cta-band-button"
-            className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-base font-medium text-surface-0 transition-all hover:bg-white hover:scale-[1.02] active:scale-[0.98]"
+            className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-base font-medium text-white transition-all hover:bg-ink/80 hover:scale-[1.02] active:scale-[0.98]"
           >
             Calculate Your Footprint
             <ArrowRight className="h-4 w-4" />
