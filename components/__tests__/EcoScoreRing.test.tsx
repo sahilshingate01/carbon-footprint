@@ -67,4 +67,21 @@ describe('EcoScoreRing component', () => {
     const textSpan = screen.getByText('15');
     expect(textSpan).toHaveStyle({ color: 'rgb(196, 68, 58)' }); // hex #c4443a is rgb(196, 68, 58)
   });
+
+  test('falls back to default color for unrecognized grade', () => {
+    const ecoScore = {
+      score: 50,
+      grade: 'X' as never,
+      label: 'Unknown'
+    };
+
+    render(<EcoScoreRing ecoScore={ecoScore} animated={false} />);
+    
+    act(() => {
+      vi.runAllTimers();
+    });
+
+    const textSpan = screen.getByText('50');
+    expect(textSpan).toHaveStyle({ color: '#666' });
+  });
 });

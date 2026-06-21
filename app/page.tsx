@@ -29,6 +29,7 @@ export default function Home() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row animate-slide-up" style={{ animationDelay: '200ms' }}>
               <Link
                 href="/calculator"
+                prefetch={true}
                 id="hero-cta-primary"
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-base font-medium text-white transition-all hover:bg-ink/80 hover:scale-[1.02] active:scale-[0.98]"
               >
@@ -37,6 +38,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/dashboard"
+                prefetch={true}
                 id="hero-cta-secondary"
                 className="inline-flex h-12 items-center justify-center rounded-full border border-hairline-strong bg-white/60 px-6 text-base font-medium text-ink backdrop-blur-sm transition-all hover:bg-white hover:scale-[1.02] active:scale-[0.98]"
               >
@@ -148,6 +150,7 @@ export default function Home() {
           </p>
           <Link
             href="/calculator"
+            prefetch={true}
             id="cta-band-button"
             className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-base font-medium text-white transition-all hover:bg-ink/80 hover:scale-[1.02] active:scale-[0.98]"
           >

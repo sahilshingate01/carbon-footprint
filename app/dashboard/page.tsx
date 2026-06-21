@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Calculator, TrendingDown, Zap, Flame, Trash2, Upload, Download, AlertTriangle, Award } from 'lucide-react';
 import { useUserData } from '@/hooks/useUserData';
@@ -21,9 +21,27 @@ const EmissionPieChart = dynamic(() => import('@/components/EmissionPieChart'), 
 export default function DashboardPage() {
   const { data, quota, isLoading, clearData, importData, exportData, updateData } = useUserData();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
 
   const entries = useMemo(() => (data ? getRecentEntries(data, 20) : []), [data]);
   const monthlyData = useMemo(() => (data ? getMonthlyAggregates(data) : []), [data]);
+
+  const historicalMessage = useMemo(() => {
+    if (!data || data.entries.length < 2) return null;
+    const firstVal = data.entries[0].emissions.total;
+    const latestVal = data.entries[data.entries.length - 1].emissions.total;
+    if (firstVal === 0) return null;
+    const diffPct = ((firstVal - latestVal) / firstVal) * 100;
+    if (diffPct > 0) {
+      return `Your emissions decreased ${diffPct.toFixed(0)}% compared to your first entry! 🎉`;
+    } else if (diffPct < 0) {
+      return `Your emissions increased ${Math.abs(diffPct).toFixed(0)}% compared to your first entry. Keep taking action to lower your footprint!`;
+    }
+    return `Your emissions are stable compared to your first entry.`;
+  }, [data]);
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -40,16 +58,25 @@ export default function DashboardPage() {
 
       const result = importData(content);
       if (result.success) {
-        alert("Data imported successfully!");
+        setNotification({ message: "Data imported successfully!", type: "success" });
       } else {
-        alert(result.error || "Failed to import data.");
+        setNotification({ message: result.error || "Failed to import data.", type: "error" });
       }
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
 
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     };
     reader.readAsText(file);
+  };
+
+  const handleClearData = () => {
+    if (confirm("Are you sure you want to clear all your carbon footprint data? This action cannot be undone.")) {
+      clearData();
+    }
   };
 
   if (isLoading) {
@@ -68,20 +95,6 @@ export default function DashboardPage() {
   const handleUpdateGoal = (goal: number | null) => {
     updateData((prev) => ({ ...prev, weeklyGoal: goal }));
   };
-
-  const historicalMessage = useMemo(() => {
-    if (!data || data.entries.length < 2) return null;
-    const firstVal = data.entries[0].emissions.total;
-    const latestVal = data.entries[data.entries.length - 1].emissions.total;
-    if (firstVal === 0) return null;
-    const diffPct = ((firstVal - latestVal) / firstVal) * 100;
-    if (diffPct > 0) {
-      return `Your emissions decreased ${diffPct.toFixed(0)}% compared to your first entry! 🎉`;
-    } else if (diffPct < 0) {
-      return `Your emissions increased ${Math.abs(diffPct).toFixed(0)}% compared to your first entry. Keep taking action to lower your footprint!`;
-    }
-    return `Your emissions are stable compared to your first entry.`;
-  }, [data]);
 
   const trend = previous && latest
     ? latest.emissions.total < previous.emissions.total
@@ -104,6 +117,28 @@ export default function DashboardPage() {
           <div>
             <span className="font-semibold text-ink">Storage Warning:</span> You are approaching your browser&apos;s storage limit ({quota.percentage}% used). Please consider exporting your data and clearing some entries to avoid data loss.
           </div>
+        </div>
+      )}
+
+      {/* Notification Toast */}
+      {notification && (
+        <div 
+          className={`mb-6 flex items-center justify-between gap-3 rounded-lg border p-4 text-sm animate-fade-in ${
+            notification.type === 'success' 
+              ? 'border-eco-a/20 bg-eco-a/5 text-eco-a' 
+              : 'border-error/20 bg-error/5 text-error'
+          }`}
+          role="status"
+          aria-live="polite"
+        >
+          <span className="font-medium">{notification.message}</span>
+          <button 
+            type="button" 
+            onClick={() => setNotification(null)}
+            className="text-xs font-semibold text-mute hover:text-ink transition-colors"
+          >
+            Dismiss
+          </button>
         </div>
       )}
 
@@ -157,7 +192,7 @@ export default function DashboardPage() {
           </button>
           <button
             type="button"
-            onClick={clearData}
+            onClick={handleClearData}
             className="inline-flex h-9 items-center gap-1.5 rounded-full border border-hairline bg-surface-2 px-3 text-sm text-mute transition-colors hover:text-error hover:border-error/30"
             title="Clear all data"
             aria-label="Clear all data"
@@ -166,6 +201,7 @@ export default function DashboardPage() {
           </button>
           <Link
             href="/calculator"
+            prefetch={true}
             className="inline-flex h-9 items-center gap-1.5 rounded-full bg-ink px-4 text-sm font-medium text-white transition-colors hover:bg-ink/80"
           >
             <Calculator className="h-3.5 w-3.5" />
@@ -191,6 +227,7 @@ export default function DashboardPage() {
           <div className="flex justify-center pb-8">
             <Link
               href="/calculator"
+              prefetch={true}
               className="inline-flex h-10 items-center gap-2 rounded-full bg-ink px-5 text-sm font-medium text-white transition-all hover:bg-ink/80"
             >
               <Calculator className="h-3.5 w-3.5" />
@@ -288,12 +325,12 @@ export default function DashboardPage() {
               <table className="w-full text-sm" aria-label="Recent Carbon Footprint Entries">
                 <thead>
                   <tr className="border-b border-hairline">
-                    <th className="pb-3 text-left font-mono text-xs uppercase tracking-wider text-mute">Date</th>
-                    <th className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Transport</th>
-                    <th className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Energy</th>
-                    <th className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Diet</th>
-                    <th className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Total</th>
-                    <th className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Score</th>
+                    <th scope="col" className="pb-3 text-left font-mono text-xs uppercase tracking-wider text-mute">Date</th>
+                    <th scope="col" className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Transport</th>
+                    <th scope="col" className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Energy</th>
+                    <th scope="col" className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Diet</th>
+                    <th scope="col" className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Total</th>
+                    <th scope="col" className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Score</th>
                   </tr>
                 </thead>
                 <tbody>

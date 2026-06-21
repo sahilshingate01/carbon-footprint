@@ -175,12 +175,14 @@ export default function LearnPage() {
           <div className="flex gap-2">
             <Link
               href="/calculator"
+              prefetch={true}
               className="inline-flex h-9 items-center justify-center rounded-full bg-ink px-4 text-xs font-medium text-white transition-colors hover:bg-ink/80"
             >
               Carbon Calculator
             </Link>
             <Link
               href="/dashboard"
+              prefetch={true}
               className="inline-flex h-9 items-center justify-center rounded-full border border-hairline bg-surface-2 px-4 text-xs text-body transition-colors hover:text-ink hover:border-hairline-strong"
             >
               View Dashboard

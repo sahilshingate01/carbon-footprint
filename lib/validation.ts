@@ -1,4 +1,5 @@
 import type { CalculatorInputs, DietType } from '@/types';
+import { VALID_TRANSPORT_MODES, VALID_DIET_TYPES } from './constants';
 
 export interface ValidationError {
   field: string;
@@ -40,9 +41,9 @@ export function validateElectricity(electricity: number): string | null {
  * Validates diet type option.
  */
 export function validateDietType(dietType: string): string | null {
-  const validTypes = ['vegetarian', 'mixed', 'non-vegetarian'];
+  const validTypes = VALID_DIET_TYPES as unknown as string[];
   if (!dietType || !validTypes.includes(dietType)) {
-    return 'Diet type must be one of: vegetarian, mixed, non-vegetarian';
+    return `Diet type must be one of: ${VALID_DIET_TYPES.join(', ')}`;
   }
   return null;
 }
@@ -51,9 +52,9 @@ export function validateDietType(dietType: string): string | null {
  * Validates transport mode option.
  */
 export function validateTransportMode(mode: string): string | null {
-  const validModes = ['car', 'bike', 'public'];
+  const validModes = VALID_TRANSPORT_MODES as unknown as string[];
   if (!mode || !validModes.includes(mode)) {
-    return 'Transport mode must be one of: car, bike, public';
+    return `Transport mode must be one of: ${VALID_TRANSPORT_MODES.join(', ')}`;
   }
   return null;
 }
@@ -145,7 +146,7 @@ export function sanitizeElectricity(electricity: unknown): number {
  * Whitelists the transport mode to valid modes: 'car', 'bike', or 'public'.
  */
 export function sanitizeTransportMode(mode: unknown): 'car' | 'bike' | 'public' {
-  const validModes = ['car', 'bike', 'public'];
+  const validModes = VALID_TRANSPORT_MODES as unknown as string[];
   if (typeof mode === 'string' && validModes.includes(mode)) {
     return mode as 'car' | 'bike' | 'public';
   }
@@ -156,8 +157,8 @@ export function sanitizeTransportMode(mode: unknown): 'car' | 'bike' | 'public' 
  * Whitelists the diet type to valid types: 'vegetarian', 'mixed', or 'non-vegetarian'.
  */
 export function sanitizeDietType(dietType: unknown): DietType {
-  const validTypes: DietType[] = ['vegetarian', 'mixed', 'non-vegetarian'];
-  if (typeof dietType === 'string' && validTypes.includes(dietType as DietType)) {
+  const validTypes = VALID_DIET_TYPES as unknown as string[];
+  if (typeof dietType === 'string' && validTypes.includes(dietType)) {
     return dietType as DietType;
   }
   return 'mixed';

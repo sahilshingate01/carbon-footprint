@@ -25,6 +25,23 @@ describe('suggestions.ts unit tests', () => {
       expect(ids).not.toContain('bike-commute');
     });
 
+    test('should generate suggestions for car user with distance <= 50', () => {
+      const inputs: CalculatorInputs = {
+        transport: { mode: 'car', distancePerWeek: 30 },
+        energy: { monthlyElectricity: 100 },
+        diet: { type: 'vegetarian' }
+      };
+      const emissions: EmissionBreakdown = { transport: 6.3, energy: 9.7, diet: 26.6, total: 42.6 };
+
+      const suggestions = generateSuggestions(inputs, emissions);
+
+      const ids = suggestions.map(s => s.id);
+      expect(ids).toContain('switch-public');
+      expect(ids).not.toContain('carpool'); // Only for distance > 50
+      expect(ids).toContain('ev-switch');
+      expect(ids).not.toContain('remote-work'); // Only for distance > 100
+    });
+
     test('should generate suggestions for bike user', () => {
       const inputs: CalculatorInputs = {
         transport: { mode: 'bike', distancePerWeek: 150 },

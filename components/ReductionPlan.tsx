@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import type { ReductionPlanDay } from '@/types';
 
@@ -31,7 +31,7 @@ const catBg: Record<string, string> = {
  * decrease carbon footprint emissions over a 30-day period.
  * Shows the first 7 days initially and allows expanding to view the full plan.
  */
-export default function ReductionPlan({ plan, completedDays = [], onToggleDay }: ReductionPlanProps) {
+export default memo(function ReductionPlan({ plan, completedDays = [], onToggleDay }: ReductionPlanProps) {
   const [expanded, setExpanded] = useState(false);
   const visible = expanded ? plan : plan.slice(0, 7);
 
@@ -120,4 +120,4 @@ export default function ReductionPlan({ plan, completedDays = [], onToggleDay }:
       </button>
     </div>
   );
-}
+});

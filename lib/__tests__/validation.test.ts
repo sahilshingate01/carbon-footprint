@@ -133,6 +133,8 @@ describe('validation.ts unit tests', () => {
       expect(sanitizeElectricity('invalid')).toBe(0);
       expect(sanitizeElectricity(NaN)).toBe(0);
       expect(sanitizeElectricity(null)).toBe(0);
+      expect(sanitizeElectricity({})).toBe(0);
+      expect(sanitizeElectricity(true)).toBe(0);
     });
   });
 
@@ -183,6 +185,20 @@ describe('validation.ts unit tests', () => {
       expect(sanitized.transport.mode).toBe('car');
       expect(sanitized.transport.distancePerWeek).toBe(100);
       expect(sanitized.energy.monthlyElectricity).toBe(250);
+      expect(sanitized.diet.type).toBe('mixed');
+    });
+
+    test('sanitizes partially missing properties in structure', () => {
+      const input = {
+        transport: null,
+        energy: "not-an-object",
+        diet: undefined
+      };
+
+      const sanitized = sanitizeCalculatorInputs(input);
+      expect(sanitized.transport.mode).toBe('car');
+      expect(sanitized.transport.distancePerWeek).toBe(0);
+      expect(sanitized.energy.monthlyElectricity).toBe(0);
       expect(sanitized.diet.type).toBe('mixed');
     });
   });

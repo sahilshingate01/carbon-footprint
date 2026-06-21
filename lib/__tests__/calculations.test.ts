@@ -6,6 +6,7 @@ import {
   getPercentageBreakdown
 } from '../calculations';
 import { EMISSION_FACTORS } from '../constants';
+import { validateCalculatorInputs, sanitizeCalculatorInputs } from '../validation';
 import type { CalculatorInputs, EmissionBreakdown } from '@/types';
 
 describe('calculations.ts unit tests', () => {
@@ -86,6 +87,15 @@ describe('calculations.ts unit tests', () => {
       expect(ecoScore.grade).toBe('F');
       expect(ecoScore.label).toBe('Poor');
     });
+
+    test('exact score thresholds mapped to correct grades', () => {
+      expect(calculateEcoScore({ transport: 0, energy: 0, diet: 0, total: 0 }).score).toBe(100);
+      expect(calculateEcoScore({ transport: 0, energy: 0, diet: 0, total: 36.15 }).score).toBe(80);
+      expect(calculateEcoScore({ transport: 0, energy: 0, diet: 0, total: 72.31 }).score).toBe(60);
+      expect(calculateEcoScore({ transport: 0, energy: 0, diet: 0, total: 108.46 }).score).toBe(40);
+      expect(calculateEcoScore({ transport: 0, energy: 0, diet: 0, total: 144.62 }).score).toBe(20);
+      expect(calculateEcoScore({ transport: 0, energy: 0, diet: 0, total: 180.77 }).score).toBe(0);
+    });
   });
 
   describe('annualizeEmissions', () => {
@@ -111,6 +121,43 @@ describe('calculations.ts unit tests', () => {
       expect(percentage.transport).toBe(0);
       expect(percentage.energy).toBe(0);
       expect(percentage.diet).toBe(0);
+    });
+  });
+
+  describe('End-to-End calculation integration flow', () => {
+    test('flows from raw input validation, sanitization, to emissions and eco-score calculations', () => {
+      const rawInputs = {
+        transportMode: 'car',
+        distance: 120.5,
+        electricity: 310.2,
+        dietType: 'mixed'
+      };
+
+      // 1. Validate
+      const validation = validateCalculatorInputs(
+        rawInputs.transportMode,
+        rawInputs.distance,
+        rawInputs.electricity,
+        rawInputs.dietType
+      );
+      expect(validation.isValid).toBe(true);
+
+      // 2. Sanitize
+      const sanitized = sanitizeCalculatorInputs({
+        transport: { mode: rawInputs.transportMode, distancePerWeek: rawInputs.distance },
+        energy: { monthlyElectricity: rawInputs.electricity },
+        diet: { type: rawInputs.dietType }
+      });
+      expect(sanitized.transport.distancePerWeek).toBe(120.5);
+
+      // 3. Calculate emissions
+      const emissions = calculateEmissions(sanitized);
+      expect(emissions.total).toBeGreaterThan(0);
+
+      // 4. Calculate score
+      const score = calculateEcoScore(emissions);
+      expect(score.score).toBeGreaterThanOrEqual(0);
+      expect(score.score).toBeLessThanOrEqual(100);
     });
   });
 });

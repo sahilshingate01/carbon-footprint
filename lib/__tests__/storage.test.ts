@@ -153,6 +153,20 @@ describe('storage.ts unit tests', () => {
 
       expect(loaded.entries).toEqual([]);
       expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
+    test('returns default structure on unknown error parsing JSON', () => {
+      mockLocalStorage.setItem(STORAGE_KEY, '{}');
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const parseSpy = vi.spyOn(JSON, 'parse').mockImplementation(() => {
+        throw new TypeError('Custom load error');
+      });
+      const data = loadUserData();
+      expect(data.entries).toEqual([]);
+      expect(consoleSpy).toHaveBeenCalled();
+      parseSpy.mockRestore();
+      consoleSpy.mockRestore();
     });
   });
 
@@ -182,6 +196,24 @@ describe('storage.ts unit tests', () => {
 
       expect(mockLocalStorage.getItem(STORAGE_KEY)).toBeNull();
       expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
+    test('handles errors gracefully when saving fails', () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const originalSetItem = localStorage.setItem;
+      localStorage.setItem = () => { throw new Error('Quota exceeded'); };
+      
+      const mockData: UserData = {
+        entries: [],
+        lastCalculation: null,
+        createdAt: new Date().toISOString()
+      };
+      saveUserData(mockData);
+      expect(consoleSpy).toHaveBeenCalled();
+      
+      localStorage.setItem = originalSetItem;
+      consoleSpy.mockRestore();
     });
   });
 
@@ -331,6 +363,28 @@ describe('storage.ts unit tests', () => {
       expect(usage.percentage).toBeLessThan(1);
       expect(usage.isApproachingLimit).toBe(false);
     });
+
+    test('handles errors gracefully when key retrieval fails', () => {
+      mockLocalStorage.setItem('key1', 'abc');
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const originalKey = localStorage.key;
+      localStorage.key = () => { throw new Error('Mock localstorage error'); };
+      const usage = getLocalStorageUsage();
+      expect(usage.usedBytes).toBe(0);
+      expect(usage.isApproachingLimit).toBe(false);
+      expect(consoleSpy).toHaveBeenCalled();
+      localStorage.key = originalKey;
+      consoleSpy.mockRestore();
+    });
+
+    test('returns zero usage when window is undefined', () => {
+      const originalWindow = global.window;
+      // @ts-expect-error - delete window is not natively allowed in the TS environment object types
+      delete global.window;
+      const usage = getLocalStorageUsage();
+      expect(usage.usedBytes).toBe(0);
+      global.window = originalWindow;
+    });
   });
 
   describe('importUserData', () => {
@@ -363,6 +417,19 @@ describe('storage.ts unit tests', () => {
       expect(result.success).toBe(false);
       expect(result.error).toContain('Malformed JSON');
     });
+
+    test('fails on unknown error during import', () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const parseSpy = vi.spyOn(JSON, 'parse').mockImplementation(() => {
+        throw new TypeError('Custom non-syntax error');
+      });
+      const result = importUserData('{}');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Failed to parse import data');
+      expect(consoleSpy).toHaveBeenCalled();
+      parseSpy.mockRestore();
+      consoleSpy.mockRestore();
+    });
   });
 
   describe('exportUserData', () => {
@@ -386,6 +453,33 @@ describe('storage.ts unit tests', () => {
       expect(clickSpy).toHaveBeenCalled();
       expect(appendSpy).toHaveBeenCalled();
       expect(removeSpy).toHaveBeenCalled();
+    });
+
+    test('returns early when window is undefined', () => {
+      const originalWindow = global.window;
+      // @ts-expect-error - delete window is not natively allowed in the TS environment object types
+      delete global.window;
+      expect(() => exportUserData()).not.toThrow();
+      global.window = originalWindow;
+    });
+  });
+
+  describe('saveUserData edge cases', () => {
+    test('returns early when window is undefined', () => {
+      const originalWindow = global.window;
+      // @ts-expect-error - delete window is not natively allowed in the TS environment object types
+      delete global.window;
+      expect(() => saveUserData({ entries: [], lastCalculation: null, createdAt: '' })).not.toThrow();
+      global.window = originalWindow;
+    });
+  });
+
+  describe('importUserData root-level validation error', () => {
+    test('reports root-level validation errors correctly', () => {
+      // Passing a primitive string JSON triggers validation error at the root (empty path)
+      const result = importUserData('"some-string"');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('root:');
     });
   });
 });

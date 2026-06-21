@@ -24,12 +24,14 @@ export default function Navbar() {
   return (
     <nav
       id="main-nav"
+      aria-label="Main navigation"
       className="fixed top-0 right-0 left-0 z-50 h-16 border-b border-hairline bg-surface-0/85 backdrop-blur-xl"
     >
       <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-4 sm:px-6">
         {/* Logo */}
         <Link
           href="/"
+          prefetch={true}
           className="flex items-center gap-2 text-ink transition-opacity hover:opacity-80"
           id="nav-logo"
         >
@@ -47,6 +49,7 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
+              prefetch={true}
               id={`nav-${link.label.toLowerCase()}`}
               aria-current={pathname === link.href ? 'page' : undefined}
               className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
@@ -64,6 +67,7 @@ export default function Navbar() {
         <div className="hidden sm:flex items-center gap-2">
           <Link
             href="/calculator"
+            prefetch={true}
             id="nav-cta"
             className="inline-flex h-8 items-center rounded-full bg-ink px-4 text-sm font-medium text-white transition-colors hover:bg-ink/80"
           >
@@ -92,6 +96,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={true}
                 onClick={() => setMobileOpen(false)}
                 aria-current={pathname === link.href ? 'page' : undefined}
                 className={`rounded-lg px-3 py-2.5 text-sm transition-colors ${
@@ -105,6 +110,7 @@ export default function Navbar() {
             ))}
             <Link
               href="/calculator"
+              prefetch={true}
               onClick={() => setMobileOpen(false)}
               className="mt-2 inline-flex h-10 items-center justify-center rounded-full bg-ink px-4 text-sm font-medium text-white transition-colors hover:bg-ink/80"
             >

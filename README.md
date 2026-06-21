@@ -143,7 +143,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Testing & Verification
 
-Verify codebase integrity and code style conformance:
+Verify codebase integrity, code coverage, and code style conformance:
 
 ### Linting
 To check for syntax, type, and code-style issues:
@@ -156,11 +156,54 @@ To run the strict lint command enforcing zero warnings:
 npm run lint:strict
 ```
 
+### Unit & Component Testing
+The test suite is built using **Vitest** and **React Testing Library**. It runs comprehensive unit and component tests across calculation libraries, storage helpers, suggestion engines, and UI elements.
+
+To run the test suite:
+```bash
+npm test
+```
+
+To run test coverage analysis and view the coverage matrix:
+```bash
+npm run test:coverage
+```
+
 ### Build Production Bundle
 To build the application for deployment:
 ```bash
 npm run build
 ```
+
+---
+
+## 🔒 Security
+
+CarbonTrack incorporates strong security features to protect user data and maintain application integrity:
+- **Content Security Policy (CSP)**: Omit `'unsafe-eval'` from production builds while maintaining it for development fast-refresh.
+- **HTTP Strict Transport Security (HSTS)**: Configured with `max-age=63072000; includeSubDomains; preload` for secure transport enforcement.
+- **Zod Schema Validation**: Standardized runtime validation schemas protect `localStorage` from ingestion of corrupted structure modifications.
+- **Input Sanitization**: Numbers are validated and clamped to strict boundaries, and strings are whitelisted to valid constants before calculations run.
+
+---
+
+## ♿ Accessibility (WCAG 2.1 AA)
+
+Designed to conform to WCAG 2.1 AA accessibility guidelines:
+- **Skip Links**: Keyboard users can bypass navigation headers using the "Skip to content" link.
+- **Semantic Structure**: Proper HTML5 elements like `<nav>`, `<main>`, `<header>`, and `<section>` organize layout flow.
+- **Accessible Headers**: Tables use semantic headings with `scope="col"` mappings.
+- **Screen Reader Charts**: Custom data-table mappings represent chart analytics, hidden from sight but readable by screen readers.
+- **Aria Attributes**: All buttons, selects, and input groups are labeled with detailed `aria-label`, `aria-describedby`, and `aria-required` controls.
+
+---
+
+## 📝 Assumptions & Methodology
+
+Calculation heuristics depend on the following baseline assumptions:
+1. **Local State Persistence**: All user footprint history is persisted strictly client-side inside the browser's `localStorage` quota.
+2. **Standard Emissions Factors**: Values represent national and global emission averages sourced from EPA and DEFRA averages.
+3. **FIFO Cap Limit**: To maintain browser database stability, entries are capped at 520 items (roughly 10 years of weekly tracking data) using FIFO queuing.
 
 ---
 
@@ -181,23 +224,23 @@ All emission calculations are based on standard industry averages derived from E
 
 ### 🚗 1. Transportation
 Emissions are calculated per week based on travel distance:
-- **Car**: `0.171 kg CO₂ / km` (based on average passenger vehicle emissions)
-- **Public Transit**: `0.046 kg CO₂ / km` (average shared train/bus transit intensity)
+- **Car**: `0.210 kg CO₂ / km` (based on average passenger vehicle emissions)
+- **Public Transit**: `0.089 kg CO₂ / km` (average shared train/bus transit intensity)
 - **Bike/Walk**: `0 kg CO₂ / km` (zero emission mode)
 
 $$\text{Transport Emissions} = \text{Distance (km)} \times \text{Factor (kg/km)}$$
 
 ### ⚡ 2. Household Energy
 Electricity is annualized and converted to weekly averages:
-- **Electricity**: `0.453 kg CO₂ / kWh` (based on global average grid emission factors)
+- **Electricity**: `0.420 kg CO₂ / kWh` (based on global average grid emission factors)
 - Calculation:
-  $$\text{Energy Emissions} = \frac{\text{Monthly Consumption (kWh)} \times 0.453 \times 12}{52}$$
+  $$\text{Energy Emissions} = \frac{\text{Monthly Consumption (kWh)} \times 0.42 \times 12}{52}$$
 
 ### 🥗 3. Dietary Choices
 Daily dietary footprints are scaled to weekly amounts:
-- **Mixed (Meat & Vegetables)**: `4.5 kg CO₂ / day`
-- **Vegetarian**: `2.5 kg CO₂ / day`
-- **Vegan**: `1.5 kg CO₂ / day`
+- **Mixed (Meat & Vegetables)**: `5.600 kg CO₂ / day`
+- **Vegetarian**: `3.800 kg CO₂ / day`
+- **Non-Vegetarian**: `7.200 kg CO₂ / day`
 - Calculation:
   $$\text{Diet Emissions} = \text{Daily Footprint} \times 7$$
 

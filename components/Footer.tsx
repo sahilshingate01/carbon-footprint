@@ -13,7 +13,7 @@ export default function Footer() {
       className="border-t border-hairline bg-surface-0"
     >
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+        <nav aria-label="Footer Navigation" className="grid grid-cols-2 gap-8 sm:grid-cols-4">
           {/* Brand */}
           <div className="col-span-2 sm:col-span-1">
             <div className="flex items-center gap-2 mb-4">
@@ -37,12 +37,12 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/calculator" className="text-sm text-body transition-colors hover:text-ink">
+                <Link href="/calculator" prefetch={true} className="text-sm text-body transition-colors hover:text-ink">
                   Calculator
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard" className="text-sm text-body transition-colors hover:text-ink">
+                <Link href="/dashboard" prefetch={true} className="text-sm text-body transition-colors hover:text-ink">
                   Dashboard
                 </Link>
               </li>
@@ -87,7 +87,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-        </div>
+        </nav>
 
         <div className="mt-12 border-t border-hairline pt-6 flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
           <p className="text-xs text-mute">
