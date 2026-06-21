@@ -2,13 +2,15 @@
 
 import { useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Calculator, TrendingDown, Zap, Flame, Trash2, Upload, Download, AlertTriangle, Award } from 'lucide-react';
+import { Calculator, Trash2, Upload, Download } from 'lucide-react';
 import { useUserData } from '@/hooks/useUserData';
 import { getRecentEntries, getMonthlyAggregates } from '@/lib/storage';
 import LoadingState from '@/components/LoadingState';
 import EmptyState from '@/components/EmptyState';
-import StatCard from '@/components/StatCard';
 import EcoScoreRing from '@/components/EcoScoreRing';
+import DashboardStats from '@/components/DashboardStats';
+import RecentEntriesTable from '@/components/RecentEntriesTable';
+import StorageWarning from '@/components/StorageWarning';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import GoalTracker from '@/components/GoalTracker';
@@ -18,6 +20,9 @@ const EmissionTrendChart = dynamic(() => import('@/components/EmissionTrendChart
 const MonthlyBarChart = dynamic(() => import('@/components/MonthlyBarChart'), { ssr: false });
 const EmissionPieChart = dynamic(() => import('@/components/EmissionPieChart'), { ssr: false });
 
+/**
+ * DashboardPage renders the user's dashboard with emission summaries, trends, and charts.
+ */
 export default function DashboardPage() {
   const { data, quota, isLoading, clearData, importData, exportData, updateData } = useUserData();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -79,46 +84,53 @@ export default function DashboardPage() {
     }
   };
 
-  if (isLoading) {
-    return <LoadingState message="Loading your dashboard..." />;
-  }
+  const latest = useMemo(() => (entries.length > 0 ? entries[entries.length - 1] : null), [entries]);
+  const previous = useMemo(() => (entries.length > 1 ? entries[entries.length - 2] : null), [entries]);
+  
+  const totalEntries = useMemo(() => (data ? data.entries.length : 0), [data]);
+  
+  const avgScore = useMemo(() => {
+    return data && totalEntries > 0
+      ? Math.round(data.entries.reduce((s, e) => s + e.ecoScore.score, 0) / totalEntries)
+      : 0;
+  }, [data, totalEntries]);
 
-  const latest = entries.length > 0 ? entries[entries.length - 1] : null;
-  const previous = entries.length > 1 ? entries[entries.length - 2] : null;
-  const totalEntries = data ? data.entries.length : 0;
-  const avgScore = data && totalEntries > 0
-    ? Math.round(data.entries.reduce((s, e) => s + e.ecoScore.score, 0) / totalEntries)
-    : 0;
-  const totalEmissions = data ? data.entries.reduce((s, e) => s + e.emissions.total, 0) : 0;
-  const completedSuggestionsCount = data?.completedSuggestions?.length || 0;
+  const totalEmissions = useMemo(() => {
+    return data ? data.entries.reduce((s, e) => s + e.emissions.total, 0) : 0;
+  }, [data]);
+
+  const completedSuggestionsCount = useMemo(() => {
+    return data?.completedSuggestions?.length || 0;
+  }, [data]);
 
   const handleUpdateGoal = (goal: number | null) => {
     updateData((prev) => ({ ...prev, weeklyGoal: goal }));
   };
 
-  const trend = previous && latest
-    ? latest.emissions.total < previous.emissions.total
-      ? 'down'
-      : latest.emissions.total > previous.emissions.total
-        ? 'up'
-        : 'neutral'
-    : 'neutral';
+  const trend = useMemo(() => {
+    return previous && latest
+      ? latest.emissions.total < previous.emissions.total
+        ? 'down'
+        : latest.emissions.total > previous.emissions.total
+          ? 'up'
+          : 'neutral'
+      : 'neutral';
+  }, [latest, previous]);
 
-  const trendDiff = previous && latest
-    ? Math.abs(latest.emissions.total - previous.emissions.total).toFixed(1)
-    : '0';
+  const trendDiff = useMemo(() => {
+    return previous && latest
+      ? Math.abs(latest.emissions.total - previous.emissions.total).toFixed(1)
+      : '0';
+  }, [latest, previous]);
+
+  if (isLoading) {
+    return <LoadingState message="Loading your dashboard..." />;
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16">
       {/* Storage Limit Warning */}
-      {quota?.isApproachingLimit && (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-error/20 bg-error/5 p-4 text-sm text-error animate-fade-in">
-          <AlertTriangle className="h-5 w-5 shrink-0 text-error" />
-          <div>
-            <span className="font-semibold text-ink">Storage Warning:</span> You are approaching your browser&apos;s storage limit ({quota.percentage}% used). Please consider exporting your data and clearing some entries to avoid data loss.
-          </div>
-        </div>
-      )}
+      <StorageWarning quota={quota} />
 
       {/* Notification Toast */}
       {notification && (
@@ -238,41 +250,15 @@ export default function DashboardPage() {
       ) : (
         <>
           {/* Top stats */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-8">
-            {latest && (
-              <StatCard
-                label="Latest Weekly"
-                value={latest.emissions.total.toFixed(1)}
-                unit="kg CO₂"
-                icon={<Flame className="h-4 w-4" />}
-                trend={trend as 'up' | 'down' | 'neutral'}
-                trendValue={`${trendDiff} kg vs last`}
-              />
-            )}
-            <StatCard
-              label="Avg Eco Score"
-              value={avgScore.toString()}
-              unit="/100"
-              icon={<TrendingDown className="h-4 w-4" />}
-            />
-            <StatCard
-              label="Total Tracked"
-              value={totalEmissions.toFixed(0)}
-              unit="kg CO₂"
-              icon={<Zap className="h-4 w-4" />}
-            />
-            <StatCard
-              label="AI Actions"
-              value={completedSuggestionsCount.toString()}
-              unit="completed"
-              icon={<Award className="h-4 w-4" />}
-            />
-            <StatCard
-              label="Entries"
-              value={totalEntries.toString()}
-              unit="weeks"
-            />
-          </div>
+          <DashboardStats
+            latestEmissionsTotal={latest?.emissions.total}
+            trend={trend}
+            trendDiff={trendDiff}
+            avgScore={avgScore}
+            totalEmissions={totalEmissions}
+            completedSuggestionsCount={completedSuggestionsCount}
+            totalEntries={totalEntries}
+          />
 
           {/* Eco score + latest breakdown */}
           <div className="grid gap-5 lg:grid-cols-3 mb-8">
@@ -319,47 +305,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Recent entries table */}
-          <div className="card-elevated rounded-xl p-6 animate-slide-up" style={{ animationDelay: '160ms' }}>
-            <h2 className="text-base font-semibold text-ink tracking-tight mb-4">Recent Entries</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm" aria-label="Recent Carbon Footprint Entries">
-                <thead>
-                  <tr className="border-b border-hairline">
-                    <th scope="col" className="pb-3 text-left font-mono text-xs uppercase tracking-wider text-mute">Date</th>
-                    <th scope="col" className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Transport</th>
-                    <th scope="col" className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Energy</th>
-                    <th scope="col" className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Diet</th>
-                    <th scope="col" className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Total</th>
-                    <th scope="col" className="pb-3 text-right font-mono text-xs uppercase tracking-wider text-mute">Score</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entries.slice().reverse().map((entry) => (
-                    <tr key={entry.id} className="border-b border-hairline/50 last:border-0">
-                      <td className="py-3 text-body">
-                        {new Date(entry.date).toLocaleDateString('en', { month: 'short', day: 'numeric' })}
-                      </td>
-                      <td className="py-3 text-right text-body">{entry.emissions.transport.toFixed(1)}</td>
-                      <td className="py-3 text-right text-body">{entry.emissions.energy.toFixed(1)}</td>
-                      <td className="py-3 text-right text-body">{entry.emissions.diet.toFixed(1)}</td>
-                      <td className="py-3 text-right font-medium text-ink">{entry.emissions.total.toFixed(1)}</td>
-                      <td className="py-3 text-right">
-                        <span className={`inline-flex items-center justify-center h-6 w-8 rounded text-xs font-semibold ${
-                          entry.ecoScore.score >= 80 ? 'bg-eco-a/10 text-eco-a' :
-                          entry.ecoScore.score >= 60 ? 'bg-eco-b/10 text-eco-b' :
-                          entry.ecoScore.score >= 40 ? 'bg-eco-c/10 text-eco-c' :
-                          entry.ecoScore.score >= 20 ? 'bg-eco-d/10 text-eco-d' :
-                          'bg-eco-f/10 text-eco-f'
-                        }`}>
-                          {entry.ecoScore.grade}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <RecentEntriesTable entries={entries} />
         </>
       )}
     </div>
