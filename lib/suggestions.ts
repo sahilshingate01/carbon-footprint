@@ -1,4 +1,22 @@
 import type { CalculatorInputs, EmissionBreakdown, AISuggestion, ReductionPlanDay } from '@/types';
+import { roundTo2 } from './calculations';
+
+/** Reduction multipliers used to estimate savings per suggestion. */
+export const SUGGESTION_FACTORS = {
+  switchPublic: 0.58,
+  carpool: 0.50,
+  evSwitch: 0.60,
+  bikeCommute: 0.30,
+  remoteWork: 0.40,
+  reduceElectricity: 0.25,
+  smartThermostat: 0.12,
+  renewableEnergy: 0.85,
+  reduceMeat: 0.35,
+  localFood: 0.10,
+  morePlantBased: 0.25,
+  reduceWaste: 0.08,
+  carbonOffset: 0.20,
+} as const;
 
 /**
  * Generate personalized carbon reduction suggestions based on user inputs.
@@ -18,7 +36,7 @@ export function generateSuggestions(
       description:
         'Taking the bus or train instead of driving can reduce your transport emissions by up to 58%. Consider commuting by metro or bus at least 3 days a week.',
       impact: 'high',
-      savingsKg: Math.round(emissions.transport * 0.58 * 100) / 100,
+      savingsKg: roundTo2(emissions.transport * SUGGESTION_FACTORS.switchPublic),
     });
 
     if (inputs.transport.distancePerWeek > 50) {
@@ -29,7 +47,7 @@ export function generateSuggestions(
         description:
           'Sharing your ride with just one other person halves your per-person emissions. Use carpooling apps or coordinate with colleagues.',
         impact: 'medium',
-        savingsKg: Math.round(emissions.transport * 0.5 * 100) / 100,
+        savingsKg: roundTo2(emissions.transport * SUGGESTION_FACTORS.carpool),
       });
     }
 
@@ -40,7 +58,7 @@ export function generateSuggestions(
       description:
         'EVs produce zero tailpipe emissions. Even accounting for electricity generation, EVs emit 50-70% less CO2 than conventional cars.',
       impact: 'high',
-      savingsKg: Math.round(emissions.transport * 0.6 * 100) / 100,
+      savingsKg: roundTo2(emissions.transport * SUGGESTION_FACTORS.evSwitch),
     });
   }
 
@@ -52,7 +70,7 @@ export function generateSuggestions(
       description:
         'For trips under 5 km, cycling is faster than public transit and produces zero emissions. Consider an e-bike for longer distances.',
       impact: 'medium',
-      savingsKg: Math.round(emissions.transport * 0.3 * 100) / 100,
+      savingsKg: roundTo2(emissions.transport * SUGGESTION_FACTORS.bikeCommute),
     });
   }
 
@@ -64,7 +82,7 @@ export function generateSuggestions(
       description:
         'Remote work eliminates commute emissions entirely. Even 2 days per week of remote work can significantly reduce your carbon footprint.',
       impact: 'high',
-      savingsKg: Math.round(emissions.transport * 0.4 * 100) / 100,
+      savingsKg: roundTo2(emissions.transport * SUGGESTION_FACTORS.remoteWork),
     });
   }
 
@@ -77,7 +95,7 @@ export function generateSuggestions(
       description:
         'Switch to LED lighting, use energy-efficient appliances, and unplug devices when not in use. These small changes can reduce consumption by 20-30%.',
       impact: 'high',
-      savingsKg: Math.round(emissions.energy * 0.25 * 100) / 100,
+      savingsKg: roundTo2(emissions.energy * SUGGESTION_FACTORS.reduceElectricity),
     });
   }
 
@@ -89,7 +107,7 @@ export function generateSuggestions(
       description:
         'Smart thermostats optimize heating and cooling schedules automatically, reducing energy waste by 10-15% without sacrificing comfort.',
       impact: 'medium',
-      savingsKg: Math.round(emissions.energy * 0.12 * 100) / 100,
+      savingsKg: roundTo2(emissions.energy * SUGGESTION_FACTORS.smartThermostat),
     });
   }
 
@@ -100,7 +118,7 @@ export function generateSuggestions(
     description:
       'Choose a green energy provider or install solar panels. Renewable energy sources produce near-zero emissions during operation.',
     impact: 'high',
-    savingsKg: Math.round(emissions.energy * 0.85 * 100) / 100,
+    savingsKg: roundTo2(emissions.energy * SUGGESTION_FACTORS.renewableEnergy),
   });
 
   // Diet suggestions
@@ -112,7 +130,7 @@ export function generateSuggestions(
       description:
         'Cutting meat intake by half can reduce diet-related emissions by 35%. Try Meatless Mondays and explore plant-based alternatives.',
       impact: 'high',
-      savingsKg: Math.round(emissions.diet * 0.35 * 100) / 100,
+      savingsKg: roundTo2(emissions.diet * SUGGESTION_FACTORS.reduceMeat),
     });
 
     suggestions.push({
@@ -122,7 +140,7 @@ export function generateSuggestions(
       description:
         'Locally sourced food travels shorter distances, reducing transport emissions. Seasonal produce also requires less energy-intensive growing methods.',
       impact: 'medium',
-      savingsKg: Math.round(emissions.diet * 0.1 * 100) / 100,
+      savingsKg: roundTo2(emissions.diet * SUGGESTION_FACTORS.localFood),
     });
   }
 
@@ -134,7 +152,7 @@ export function generateSuggestions(
       description:
         'Increasing plant-based meals to 4+ days per week can reduce your diet emissions by 25%. Explore legumes, grains, and plant proteins.',
       impact: 'medium',
-      savingsKg: Math.round(emissions.diet * 0.25 * 100) / 100,
+      savingsKg: roundTo2(emissions.diet * SUGGESTION_FACTORS.morePlantBased),
     });
   }
 
@@ -145,7 +163,7 @@ export function generateSuggestions(
     description:
       'About 8-10% of global emissions come from food waste. Plan meals, store food properly, and compost organic waste.',
     impact: 'low',
-    savingsKg: Math.round(emissions.diet * 0.08 * 100) / 100,
+    savingsKg: roundTo2(emissions.diet * SUGGESTION_FACTORS.reduceWaste),
   });
 
   // General
@@ -156,7 +174,7 @@ export function generateSuggestions(
     description:
       'Support verified carbon offset projects like reforestation, renewable energy, or methane capture to neutralize your remaining emissions.',
     impact: 'medium',
-    savingsKg: Math.round(emissions.total * 0.2 * 100) / 100,
+    savingsKg: roundTo2(emissions.total * SUGGESTION_FACTORS.carbonOffset),
   });
 
   return suggestions;

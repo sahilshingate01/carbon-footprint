@@ -1,3 +1,5 @@
+import type { DietType, TransportMode } from '@/types';
+
 /**
  * CarbonTrack Constants
  * Contains all static values, thresholds, emission factors, and configuration settings.
@@ -103,3 +105,51 @@ export const CATEGORY_ICONS = {
  * localStorage storage key for persisting dashboard state.
  */
 export const STORAGE_KEY = 'carbon-footprint-data';
+
+/** Number of weeks in a month (approximate). */
+export const WEEKS_PER_MONTH = 4.33;
+
+/** Number of weeks in a year. */
+export const WEEKS_PER_YEAR = 52;
+
+/** Maximum stored entries (10 years of weekly data). */
+export const MAX_STORED_ENTRIES = 520;
+
+/** localStorage size limit in bytes (5 MB). */
+export const LOCAL_STORAGE_MAX_BYTES = 5 * 1024 * 1024;
+
+/** Storage warning threshold percentage. */
+export const STORAGE_WARNING_THRESHOLD = 80;
+
+/**
+ * Type guard to check if a value is a valid DietType.
+ */
+export function isValidDietType(value: string): value is DietType {
+  return (VALID_DIET_TYPES as readonly string[]).includes(value);
+}
+
+/**
+ * Type guard to check if a value is a valid TransportMode.
+ */
+export function isValidTransportMode(value: string): value is TransportMode {
+  return (VALID_TRANSPORT_MODES as readonly string[]).includes(value);
+}
+
+/**
+ * Get eco-score grade CSS class based on the score value.
+ */
+export function getGradeColorClass(score: number): string {
+  if (score >= 80) return 'bg-eco-a/10 text-eco-a';
+  if (score >= 60) return 'bg-eco-b/10 text-eco-b';
+  if (score >= 40) return 'bg-eco-c/10 text-eco-c';
+  if (score >= 20) return 'bg-eco-d/10 text-eco-d';
+  return 'bg-eco-f/10 text-eco-f';
+}
+
+/** Carbon offset equivalent factors. */
+export const EQUIVALENCY_FACTORS = {
+  treesYear: 22,
+  drivingKm: 0.20,
+  flightKm: 0.115,
+  lightbulbHours: 0.024,
+} as const;

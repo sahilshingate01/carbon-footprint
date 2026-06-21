@@ -1,7 +1,4 @@
-/**
- * Conversion utility functions for translating carbon emissions (kg CO2)
- * into relatable everyday equivalents.
- */
+import { EQUIVALENCY_FACTORS } from './constants';
 
 export interface CarbonEquivalents {
   treesYear: number;
@@ -18,12 +15,15 @@ export interface CarbonEquivalents {
  * - Driving: Average passenger vehicle emits ~0.20 kg CO2 per km.
  * - Flight: Commercial passenger flight emits ~0.115 kg CO2 per km per passenger.
  * - Lightbulb: Running a 60W incandescent bulb for 1 hour emits ~0.024 kg CO2.
+ *
+ * @param emissionsKg - The total carbon emissions in kg CO2.
+ * @returns An object containing equivalent values for trees, driving distance, flight distance, and lightbulb hours.
  */
 export function getCarbonEquivalents(emissionsKg: number): CarbonEquivalents {
   return {
-    treesYear: emissionsKg / 22,
-    drivingKm: emissionsKg / 0.20,
-    flightKm: emissionsKg / 0.115,
-    lightbulbHours: emissionsKg / 0.024,
+    treesYear: emissionsKg / EQUIVALENCY_FACTORS.treesYear,
+    drivingKm: emissionsKg / EQUIVALENCY_FACTORS.drivingKm,
+    flightKm: emissionsKg / EQUIVALENCY_FACTORS.flightKm,
+    lightbulbHours: emissionsKg / EQUIVALENCY_FACTORS.lightbulbHours,
   };
 }
